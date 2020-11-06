@@ -3,6 +3,14 @@ from random import random
 
 P = lambda x: random() < x
 
+class System:
+    def __init__(self, numberMachine, machines, buffers):
+        self.numberMachine = numberMachine
+        self.numberBuffer = numberMachine - 1
+        self.historicState = []
+        self.machines = machines
+        self.buffers = buffers
+    
 class MachineLineNode:
     
     def __init__ (self, name):
@@ -22,8 +30,9 @@ class Machine (MachineLineNode):
     
     def reset (self):
         self.is_up = True
-    
+
     def is_blocked (self):
+
         return self.downstream.is_full() or self.upstream.is_empty()
     
     def phase_1_rand (self):
@@ -65,8 +74,7 @@ class Buffer (MachineLineNode):
     def __init__ (self, buffer_type, capacity, name):
         self.type = buffer_type
         if self.type == Buffer.Type.MIDDLE: self.capacity = capacity
-        super(Buffer, self).__init__(name)
-        
+        super(Buffer, self).__init__(name)  
         self.reset()
     
     def reset (self):
