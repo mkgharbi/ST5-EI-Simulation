@@ -1,5 +1,25 @@
 from MachineLine import Machine, Buffer, System, INPUT_BUF, OUTPUT_BUF
 
+def probabilityBreakdownInput(j):
+    while True:
+        try:
+            firstInput = float(input("Enter the breakdown probability of machine " + str(j+1) + " : "))
+            if 0 <= firstInput <= 1:
+                return (firstInput)
+            print("Please try again, it must be a number between 0 and 1")
+        except ValueError:
+            print("Input must be numeric.")
+
+def probabilityRepairInput(j):
+    while True:
+        try:
+            firstInput = float(input("Enter the repair probability of machine " + str(j+1) + " : "))
+            if 0 <= firstInput <= 1:
+                return (firstInput)
+            print("Please try again, it must be a number between 0 and 1")
+        except ValueError:
+            print("Input must be numeric.")
+
 
 def main():
     print("------Simulation------")
@@ -13,8 +33,8 @@ def main():
     print(bufferTable)
     machineTable = []
     for j in range(numberMachine):
-        breakdown_prob = input("Enter the breakdown probability of machine " + str(j+1) + " : ")
-        repair_prob = input("Enter the repair probability of machine " + str(j+1) + " : ")
+        breakdown_prob = probabilityBreakdownInput(j)
+        repair_prob = probabilityRepairInput(j)
         if (j == 0):
             machineTable.append(Machine(breakdown_prob,repair_prob,INPUT_BUF,bufferTable[j],"Machine"+str(j+1)))
         if ( j == numberMachine-1):
