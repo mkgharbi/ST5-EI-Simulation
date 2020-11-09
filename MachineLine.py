@@ -95,11 +95,11 @@ class Buffer (MachineLineNode):
             return False
     
     def pop (self):
-        if self.type == Buffer.Type.MIDDLE or Buffer.Type.INPUT_COUNTER:
+        if self.type in [Buffer.Type.MIDDLE, Buffer.Type.INPUT_COUNTER]:
             self.current -= 1
 
     def push (self):
-        if self.type == Buffer.Type.MIDDLE or Buffer.Type.OUTPUT_COUNTER:
+        if self.type == [Buffer.Type.MIDDLE, Buffer.Type.OUTPUT_COUNTER]:
             self.current += 1
 
     def __str__ (self):
