@@ -3,6 +3,14 @@ from random import random
 
 P = lambda x: random() < x
 
+def generateState(machines, buffers):
+    state =[]
+    for i in range(len(machines)):
+        state.append(machines[i])
+        if (i < len(machines)-1):
+            state.append(buffers[i])
+    return state
+
 class System:
     def __init__(self, numberMachine, machines, buffers):
         self.numberMachine = numberMachine
@@ -10,12 +18,15 @@ class System:
         self.historicState = []
         self.machines = machines
         self.buffers = buffers
+        self.currentState = generateState(self.machines,self.buffers)
     
     def getMachines(self):
         return self.machines
     def getBuffers(self):
         return self.buffers
-    
+    def getCurrentState(self):
+        return self.currentState
+
 class MachineLineNode:
     
     def __init__ (self, name):

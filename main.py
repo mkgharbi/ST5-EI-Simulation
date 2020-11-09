@@ -20,15 +20,19 @@ def probabilityRepairInput(j):
         except ValueError:
             print("Input must be numeric.")
 
-def generateStringState(machines, buffers):
+def generateStringState(system):
     result = 'State = ( '
-    for i in range(len(machines)):
-        result += str(machines[i])
-        if (i < (len(machines) - 1)):
-            result += str(machines[i].downstream)
+    for i in range(len(system.getCurrentState())):
+        result += str(system.getCurrentState()[i])
     result += ' )'
     return result
 
+def generatePossibleStatesFromCurrent(system):
+    possibleNextStates = []
+    print(generateStringState(system, possibleNextStates))
+    print("Possible states :")
+    
+    #possibleNextStates.append()
 
 def main():
     print("------Simulation------")
@@ -59,17 +63,25 @@ def main():
         choice = input("Pick your choice : ").upper()
         if (choice == "Q"):
             break
-        if (choice == "A"):
+        else:
             timeUnit = int(input("Enter the time slot : "))
-            instantT = 0 
-            while(instantT <= timeUnit):
-                print("T = " + str(instantT))
-                for machine in system.getMachines():
-                    machine.phase_1_rand()
-                for machine in system.getMachines():
-                    machine.phase_2()
-                print(generateStringState(system.getMachines(),system.getBuffers()))
-                instantT +=1
+            instantT = 0
+            if (choice == "A"):
+                while(instantT <= timeUnit):
+                    print("T = " + str(instantT))
+                    for machine in system.getMachines():
+                        machine.phase_1_rand()
+                    for machine in system.getMachines():
+                        machine.phase_2()
+                    print(generateStringState(system))
+                    instantT +=1
+            elif(choice == 'B'):
+                while(instantT <= timeUnit):
+                    print("T = " + str(instantT))
+                    generatePossibleStatesFromCurrent(system)
+                    choosenState = input("Choose possible state: ")
+                    instantT +=1
+
 
 if __name__ == "__main__":
     main()
