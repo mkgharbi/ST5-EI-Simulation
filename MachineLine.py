@@ -11,6 +11,11 @@ class System:
         self.machines = machines
         self.buffers = buffers
     
+    def getMachines(self):
+        return self.machines
+    def getBuffers(self):
+        return self.buffers
+    
 class MachineLineNode:
     
     def __init__ (self, name):
@@ -62,7 +67,7 @@ class Machine (MachineLineNode):
             self.downstream.push()
     
     def __str__ (self):
-        return f'MACHINE:{self.name}' + f' - {"UP" if self.is_up else "DOWN"}'
+        return f'{self.name}' + f' - {"UP" if self.is_up else "DOWN"}'
 
 class Buffer (MachineLineNode):
     
@@ -99,18 +104,19 @@ class Buffer (MachineLineNode):
             self.current -= 1
 
     def push (self):
-        if self.type == [Buffer.Type.MIDDLE, Buffer.Type.OUTPUT_COUNTER]:
+        if self.type in [Buffer.Type.MIDDLE, Buffer.Type.OUTPUT_COUNTER]:
             self.current += 1
 
     def __str__ (self):
         if self.type == Buffer.Type.MIDDLE:
-            return f'BUFFER:{self.name}' + f' - {self.current}/{self.capacity}'
+            return f', {self.name}' + f' - {self.current}/{self.capacity}, '
         elif self.type in [Buffer.Type.INPUT, Buffer.Type.OUTPUT]:
-            return f'BUFFER:{self.name}' + f' - {"INPUT" if self.type == Buffer.Type.INPUT else "OUTPUT"}'
+            return f'{self.name}' + f' - {"INPUT" if self.type == Buffer.Type.INPUT else "OUTPUT"}'
         elif self.type in [Buffer.Type.INPUT_COUNTER, Buffer.Type.OUTPUT_COUNTER]:
-            return f'BUFFER:{self.name}' + f' - {"INPUT" if self.type == Buffer.Type.INPUT_COUNTER else "OUTPUT"} {self.current}'
+            return f'{self.name}' + f' - {"INPUT " if self.type == Buffer.Type.INPUT_COUNTER else "OUTPUT "} {self.current}, '
 
 INPUT_BUF = Buffer(Buffer.Type.INPUT, 0, "INPUT")                       # MUST BE USED AS INPUT BUFFER OF THE MACHINE LINE
 INPUT_CNT_BUF = Buffer(Buffer.Type.INPUT_COUNTER, 0, "INPUT_CNT")       # MUST BE USED AS INPUT BUFFER OF THE MACHINE LINE
 OUTPUT_BUF = Buffer(Buffer.Type.OUTPUT, 0, "OUTPUT")                    # MUST BE USED AS OUTPUT BUFFER OF THE MACHINE LINE
 OUTPUT_CNT_BUF = Buffer(Buffer.Type.OUTPUT_COUNTER, 0, "OUTPUT_CNT")    # MUST BE USED AS OUTPUT BUFFER OF THE MACHINE LINE
+ 

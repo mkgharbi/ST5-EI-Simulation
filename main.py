@@ -1,4 +1,4 @@
-from MachineLine import Machine, Buffer, System, INPUT_BUF, OUTPUT_BUF
+from MachineLine import Machine, Buffer, System, INPUT_CNT_BUF, OUTPUT_CNT_BUF
 
 def probabilityBreakdownInput(j):
     while True:
@@ -20,6 +20,15 @@ def probabilityRepairInput(j):
         except ValueError:
             print("Input must be numeric.")
 
+def generateStringState(machines, buffers):
+    result = 'State = ( '
+    for i in range(len(machines)):
+        result += str(machines[i])
+        if (i < (len(machines) - 1)):
+            result += str(machines[i].downstream)
+    result += ' )'
+    return result
+
 
 def main():
     print("------Simulation------")
@@ -28,28 +37,39 @@ def main():
     machine = []
     bufferTable = []
     for i in range(numberMachine-1) :
-        sizei = input("Enter the buffer size of buffer" + str(i+1) + " : ")
-        bufferTable.append(Buffer(0,sizei,'buffer'+str(i+1)))
-    print(bufferTable)
+        sizei = input("Enter the buffer size of Buffer" + str(i+1) + " : ")
+        bufferTable.append(Buffer(Buffer.Type.MIDDLE,sizei,'Buffer'+str(i+1)))
     machineTable = []
     for j in range(numberMachine):
         breakdown_prob = probabilityBreakdownInput(j)
         repair_prob = probabilityRepairInput(j)
         if (j == 0):
-            machineTable.append(Machine(breakdown_prob,repair_prob,INPUT_BUF,bufferTable[j],"Machine"+str(j+1)))
-        if ( j == numberMachine-1):
-            machineTable.append(Machine(breakdown_prob,repair_prob,bufferTable[j-1],OUTPUT_BUF,"Machine"+str(j+1)))
+            machineTable.append(Machine(breakdown_prob,repair_prob,INPUT_CNT_BUF,bufferTable[j],"Machine1"))
+        elif (j == numberMachine-1):
+            machineTable.append(Machine(breakdown_prob,repair_prob,bufferTable[j-1],OUTPUT_CNT_BUF,"Machine"+str(j+1)))
         else:  
             machineTable.append(Machine(breakdown_prob,repair_prob,bufferTable[j-1],bufferTable[j],"Machine"+str(j+1)))
     system = System(numberMachine, machineTable, bufferTable)
-    print("------Choosing simulation type------")
-    print("--Click A: Automatic simulation")
-    print("--Click B: 1-step simulation")
-    choice = input("Choose simulation type : ")
-    if (choice == "A"):
-        timeUnit = input("Enter the time slot : ")
-    
-
+    while(1):
+        print("************************************")
+        print("------Choosing simulation type------")
+        print("--Click A: Automatic simulation")
+        print("--Click B: 1-step simulation")
+        print("--Click Q: Exit")
+        choice = input("Pick your choice : ").upper()
+        if (choice == "Q"):
+            break
+        if (choice == "A"):
+            timeUnit = int(input("Enter the time slot : "))
+            instantT = 0 
+            while(instantT <= timeUnit):
+                print("T = " + str(instantT))
+                for machine in system.getMachines():
+                    machine.phase_1_rand()
+                for machine in system.getMachines():
+                    machine.phase_2()
+                print(generateStringState(system.getMachines(),system.getBuffers()))
+                instantT +=1
 
 if __name__ == "__main__":
     main()
