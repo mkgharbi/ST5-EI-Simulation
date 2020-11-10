@@ -279,12 +279,14 @@ def total_production_rate_plusieurs_simulations(ListeTableauSimulation, window_l
     
 def graph_total_production_rate(ListeTableauSimulation, window_lenght):
     taille_max = len(ListeTableauSimulation)
-    Tailles_buffer = list(range(1,taille_max+1))
+    Tailles_buffer = []
     Prod_rate =[]
     Tmax = len(ListeTableauSimulation[0])
 
-    for k in range(N):
+    for k in range(taille_max):
+        Tailles_buffer.append(k+1)
         Prod_rate.append(total_production_rate(ListeTableauSimulation[k], window_lenght))
+        
     plt.plot(Tailles_buffer,Prod_rate)
     plt.xlabel("Taille du buffer")
     plt.ylabel("Taux de productoin pour une fenêtre de taille"+ str(window_lenght))
@@ -331,12 +333,13 @@ def effective_production_rate_plusieurs_simulations(ListeTableauSimulation, wind
     
 def graph_effective_production_rate(ListeTableauSimulation, window_lenght):
     taille_max = len(ListeTableauSimulation)
-    Tailles_buffer = list(range(1,taille_max+1))
+    Tailles_buffer = []
     Prod_rate =[]
-    Tmax = len(ListeTableauSimulation[0])
 
-    for k in range(N):
+    for k in range(taille_max):
+        Tailles_buffer.append(k+1)
         Prod_rate.append(effective_production_rate(ListeTableauSimulation[k], window_lenght))
-    plt.plot(Tailles_buffer,Prod_rate)
+        
+    plt.plot(Tailles_buffer, Prod_rate, label = "Taux effectif de productoin pour une fenêtre de taille"+ str(window_lenght))
     plt.xlabel("Taille du buffer")
-    plt.ylabel("Taux effectif de productoin pour une fenêtre de taille"+ str(window_lenght))
+    plt.legend()
