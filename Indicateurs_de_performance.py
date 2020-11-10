@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Tableau test
+
+# Tableaux test
 
 T1 = [["UP",1,3,"DOWN",0,4,"Up",4,4,"DOWN",0,1],["DOWN",1,3,"UP",1,4,"UP",4,4,"UP",0,1],["DOWN",0,3,"UP",1,4,"UP",3,4,"DOWN",1,0]]
 
@@ -19,6 +20,7 @@ T2 = [["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN",4,5,"UP",4,5,"DOWN",2,6,"DOWN",0,1],
 
 
 # PROBA DISTRIB
+
 
 def proba_distrib_LT(TableauSimulation, temps_attendu):
     T_entree = []
@@ -74,6 +76,7 @@ def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
     
 # WORK IN PROGRESS
     
+    
 def work_in_progress(TableauSimulation, t):
     
     S = 0
@@ -81,8 +84,6 @@ def work_in_progress(TableauSimulation, t):
     for k in range(nb_bi):  
         S += TableauSimulation[t][3*k+1]  # On ne regarde que l'étape t pour compter les biens pas encore fini
     return S
-    
-    
     
 def graph_work_in_progress(TableauSimulation): 
     Temps = []
@@ -113,6 +114,7 @@ def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
     
 
 # BLOCKING PROBABILITY
+
 
 def blocking_probability(TableauSimulation,i):
     S_full = 0
@@ -155,19 +157,46 @@ def graph_blocking_probability_plusieurs_simulations(ListeTableauSimulation):
 # STRAVATION PROBABILITY
 
 
-def stravation_probability(TableauSimulation):
+def stravation_probability(TableauSimulation,i):
     S = 0
     S_empty = 0
     T = len(TableauSimulation)
-    nb_bi = int(len(TableauSimulation[0])/3 - 1)
     
     for t in range(T):
-        for k in range(nb_bi):
-            if TableauSimulation[t][3*k+1] == 0:
-                S_empty += 1
-            S += 1
+        if TableauSimulation[t][3*i+1] == 0:
+            S_empty += 1
+        S += 1
     return S_empty/S
     
+def graph_stravation_probability(TableauSimulation): 
+    Buffer = []
+    nb_buffer = int(len(TableauSimulation[0])/3 - 1)
+    Proba_empty = []    
+    
+    for i in range(nb_buffer):
+        Buffer.append(i)
+        Proba_empty.append(stravation_probability(TableauSimulation,i))
+    plt.plot(Buffer,Proba_empty)
+    plt.show()
+    
+def graph_stravation_probability_plusieurs_simulations(ListeTableauSimulation):
+    Buffer = []
+    nb_buffer = int(len(TableauSimulation[0])/3 - 1)
+    Proba_empty = []  
+    N = len(ListeTableauSimulation)
+    
+    for i in range(nb_buffer):
+        Buffer.append(i)
+        
+        Liste_Probas_buffer_i = []
+        for k in range(N):
+            Liste_Probas_buffer_i.append(stravation_probability(ListeTableauSimulation[k],i))
+        Proba_empty.append(np.mean(Liste_Probas_buffer_i))
+    plt.plot(Buffer,Proba_empty)
+    plt.show()
+    
+
+# TOTAL PRODUCTION RATE
     
     
 def total_production_rate(TableauSimulation, window_lenght):
@@ -184,7 +213,10 @@ def total_production_rate(TableauSimulation, window_lenght):
         
     return nb_exit / t             # Car t est aussi le nombre de fenetre qu'on a considéré
     
+def total_production_rate_plusieurs_tableaux(ListeTableauSimulation, window_lenght):
+    Moyennes = []
     
+
 
 def effective_production_rate(TableauSimulation, window_lenght):
     T_entree = []
