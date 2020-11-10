@@ -4,20 +4,16 @@ import numpy as np
 
 # Tableaux test
 
-T1 = [[True,1,3,False,0,4,True,4,4,False,0,1],[False,1,3,True,1,4,True,4,4,True,0,1],[False,0,3,True,1,4,True,3,4,False,1,0]]
+T1 = [[True,1,3,False,0,4,True,4,4,False,0,1],
+        [False,1,3,True,1,4,True,4,4,True,0,1],
+        [False,0,3,True,1,4,True,3,4,False,1,0]]
 
 T2 = [[True,1,3,False,0,4,True,4,4,False,4,5,True,4,5,False,2,6,False,0,1],
-
-    [True,2,3,True,1,4,True,4,4,False,3,5,True,4,5,False,2,6,False,0,1],
-    
-    [True,1,3,False,0,4,True,4,4,False,2,5,True,4,5,False,2,6,False,0,1],
-    
-    [True,1,3,False,0,4,True,3,4,False,1,5,True,4,5,False,2,6,False,1,1],
-    
-    [True,1,3,False,0,4,True,4,4,False,0,5,True,4,5,False,2,6,False,0,0],
-    
-    [True,1,3,False,0,4,True,4,4,True,1,5,True,4,5,False,2,6,False,1,0]]
-
+      [True,2,3,True,1,4,True,4,4,False,3,5,True,4,5,False,2,6,False,0,1],    
+      [True,1,3,False,0,4,True,4,4,False,2,5,True,4,5,False,2,6,False,0,1],    
+      [True,1,3,False,0,4,True,3,4,False,1,5,True,4,5,False,2,6,False,1,1],    
+      [True,1,3,False,0,4,True,4,4,False,0,5,True,4,5,False,2,6,False,0,0],    
+      [True,1,3,False,0,4,True,4,4,True,1,5,True,4,5,False,2,6,False,1,0]]
 
 
 # PROBA DISTRIB
@@ -27,6 +23,7 @@ def proba_distrib_LT(TableauSimulation, temps_attendu):
     T_entree = []
     T_sortie = []
     T = len(TableauSimulation)
+    
     for t in range(T):
         if TableauSimulation[t][-1] == 1:      # Si une piece rentre
             T_entree.append(t)
@@ -34,10 +31,11 @@ def proba_distrib_LT(TableauSimulation, temps_attendu):
             T_sortie.append(t)
             
     LT = []
-    
     for k in range(len(T_sortie)):
-        LT.append(T_sortie[k]-T_entree[k])
+        LT.append(T_sortie[k]-T_entree[k]+1)
     
+    if LT ==[]:
+        return "pas de pieces qui sortent, on ne peut pas définir une moyenne"
     S = 0
     for t in LT:
         if t == temps_attendu:
@@ -52,9 +50,11 @@ def graph_proba_distrib_LT(TableauSimulation):
     Tmax = len(TableauSimulation)
     
     for t in range(Tmax):
-        Delais.append(t)
-        Probas.append(proba_distrib_LT(TableauSimulation,t))
+        Delais.append(t+1)
+        Probas.append(proba_distrib_LT(TableauSimulation,t+1))
     plt.plot(Delais,Probas)
+    plt.xlabel("Temps nécéssaire à la fabrication d'une pièce")
+    plt.ylabel("Probabilité")
     plt.show()
     
 def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
@@ -64,23 +64,37 @@ def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
     Tmax = len(ListeTableauSimulation[0])
     
     for t in range(Tmax):
-        Delais.append(t)
+        Delais.append(t+1)
         
         Liste_Probas_a_t = []
         for k in range(N):
-            Liste_Probas_a_t.append(proba_distrib_LT(ListeTableauSimulation[k],t))
+            Liste_Probas_a_t.append(proba_distrib_LT(ListeTableauSimulation[k],1+t))
         Probas.append(np.mean(Liste_Probas_a_t))
     plt.plot(Delais,Probas)
-    plt.xlabel("unité de temps")
-    plt.ylabel("Probabilité du lead time")
+    plt.xlabel("Temps nécéssaire à la fabrication d'une pièce")
+    plt.ylabel("Probabilité")
     plt.show()
 
+def graph_LT_p1_p2_r1_r2(ListeTableauSimulation, proba_controlee):
+    N = len(ListeTableauSimulation)
+    T = len(ListeTableauSimulation[0])
+    LT = []
+    Probas = [k/100 for k in range(1,101)]
+    
+    for k in range(N):
+        Delais_ponderes = []
+        for t in range(T):
+            Delais_ponderes.append(t*proba_distrib_LT(ListeTableauSimulation[k],t))
+        LT.append(sum(Delais_ponderes))
+    plt.plot(Probas, LT, label = "Temps moyen en fonction de" + proba_controlee )
+    plt.xlabel("Temps nécéssaire à la fabrication d'une pièce")
+    plt.legend()
+    
     
 # WORK IN PROGRESS
     
     
-def work_in_progress(TableauSimulation, t):
-    
+def work_in_progress(TableauSimulation,t):
     S = 0
     nb_bi = int(len(TableauSimulation[0])/3 - 1)
     for k in range(nb_bi):  
@@ -98,27 +112,39 @@ def graph_work_in_progress(TableauSimulation):
     plt.plot(Temps,Nb_piece_in_process)
     plt.xlabel("unité de temps")
     plt.ylabel("nombre de pièces en cours de traitement")
-    plt.show()
     
-def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation, taille_max):
-    L = [] * taille_max
+def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
+    taille_max = len(ListeTableauSimulation)
+    Tailles_buffer = list(range(1,taille_max+1))
     N = len(ListeTableauSimulation)
     Tmax = len(ListeTableauSimulation[0])
+    WIP = []
 
     for k in range(N):
-        i = ListeTableauSimulation[k][2]
-        wip = work_in_progress(ListeTableauSimulation[k],Tmax-1) 
-        L[i].append(wip)
+        WIP.append(work_in_progress(ListeTableauSimulation[k],Tmax-1))
     
-    Tailles_buffer = [ k for k in range(taille_max)]
-    WIP = [ np.mean(L[k]) for k in range(taille_max)]
- 
-    plt.plot(Tailles_buffer,WIP)
+    plt.plot(Tailles_buffer, WIP, label = "Nombre de pièces en cours de traitement")
     plt.xlabel("Taille du buffer")
-    plt.ylabel("nombre de pièces en cours de traitement")
-    plt.show()
+    plt.legend()
     
-def troughput(TableauSimulation):
+def graph_WIP_p1_p2_r1_r2(ListeTableauSimulation, parametre_controle):
+    WIP = []
+    Proba = [ k/100 for k in range(1,101)]
+    N = len(ListeTableauSimulation)
+    T = len(ListeTableauSimulation[0])
+    
+    for k in range(N):
+        WIP.append(work_in_progress(ListeTableauSimulation[k],T))
+    
+    plt.plot(Proba, WIP, label="WIP en fonction de "+ parametre_controle)
+    plt.ylabel("WIP")
+    plt.legend()
+    
+    
+#  THROUGHPUT
+
+
+def throughput(TableauSimulation):
     S = 0
     Tmax = len(TableauSimulation)
     
@@ -126,23 +152,19 @@ def troughput(TableauSimulation):
         S += TableauSimulation[t][-2]
     return S
 
-def graph_throughput_plusieurs_simulations(ListeTableauSimulation, taille_max):
-    L = [] * taille_max
+def graph_throughput_plusieurs_simulations(ListeTableauSimulation):
+    Tailles_buffer = []
     N = len(ListeTableauSimulation)
     Tmax = len(ListeTableauSimulation[0])
+    Thoughputs = []
 
     for k in range(N):
-        i = ListeTableauSimulation[k][2]
-        troughput = troughput(ListeTableauSimulation[k]) 
-        L[i].append(wip)
+        Tailles_buffer.append(k+1)
+        Thoughputs.append(throughput(ListeTableauSimulation[k])) 
     
-    Tailles_buffer = [ k for k in range(taille_max)]
-    tp = [ np.mean(L[k]) for k in range(taille_max)]
- 
-    plt.plot(Tailles_buffer,tp)
+    plt.plot(Tailles_buffer,Thoughputs, label = "nombre de pièces terminées")
     plt.xlabel("Taille du buffer")
-    plt.ylabel("Nombre de pièces terminées")
-    plt.show()
+    plt.legend()
 
     
 # BLOCKING PROBABILITY
@@ -166,10 +188,9 @@ def graph_blocking_probability(TableauSimulation):
     for i in range(nb_buffer):
         Buffer.append(i)
         Proba_full.append(blocking_probability(TableauSimulation,i))
-    plt.plot(Buffer,Proba_full)
+    plt.plot(Buffer, Proba_full, label = "proba d'être bloqué")
     plt.xlabel("numero du buffer")
-    plt.ylabel("Proba d'être ")
-    plt.show()
+    plt.legend()
     
 def graph_blocking_probability_plusieurs_simulations(ListeTableauSimulation):
     Buffer = []
@@ -184,8 +205,9 @@ def graph_blocking_probability_plusieurs_simulations(ListeTableauSimulation):
         for k in range(N):
             Liste_Probas_buffer_i.append(blocking_probability(ListeTableauSimulation[k],i))
         Proba_full.append(np.mean(Liste_Probas_buffer_i))
-    plt.plot(Buffer,Proba_full)
-    plt.show()
+    plt.plot(Buffer, Proba_full, label = "Probabilité d'avoir un buffer bloqué")
+    plt.xlabel("numéro du buffer")
+    plt.legend()
  
      
 # STRAVATION PROBABILITY
@@ -255,26 +277,17 @@ def total_production_rate_plusieurs_simulations(ListeTableauSimulation, window_l
         Moyennes.append(total_production_rate(ListeTableauSimulation[k], window_lenght))
     return np.mean(Moyennes)
     
-# def graph_total_production_rate(ListeTableauSimulation, window_lenght):
-#     Tailles_bufffer = []
-#     Prod_rate =[]
-#     N = len(ListeTableauSimulation)
-#     Tmax = len(ListeTableauSimulation[0])
-# 
-#     for k in range(N):
-#         Tailles_buffer.append(k+1)
-#         
-#         
-#         troughput = troughput(ListeTableauSimulation[k]) 
-#         L[i].append(wip)
-#     
-#     Tailles_buffer = [ k for k in range(taille_max)]
-#     tp = [ np.mean(L[k]) for k in range(taille_max)]
-#  
-#     plt.plot(Tailles_buffer,tp)
-#     plt.xlabel("Taille du buffer")
-#     plt.ylabel("Nombre de pièces terminées")
-#     plt.show()
+def graph_total_production_rate(ListeTableauSimulation, window_lenght):
+    taille_max = len(ListeTableauSimulation)
+    Tailles_buffer = list(range(1,taille_max+1))
+    Prod_rate =[]
+    Tmax = len(ListeTableauSimulation[0])
+
+    for k in range(N):
+        Prod_rate.append(total_production_rate(ListeTableauSimulation[k], window_lenght))
+    plt.plot(Tailles_buffer,Prod_rate)
+    plt.xlabel("Taille du buffer")
+    plt.ylabel("Taux de productoin pour une fenêtre de taille"+ str(window_lenght))
 
 
 
@@ -301,7 +314,7 @@ def effective_production_rate(TableauSimulation, window_lenght):
         for tau in range(t,t+wl):
             if tau in T_sortie :
                 k = T_sortie.index(tau) 
-                lt= T_sortie[k] - T_entree[k]
+                lt = T_sortie[k] - T_entree[k] + 1
                 if lt <= wl:
                     nb_exit +=1
         t+=1
@@ -315,3 +328,15 @@ def effective_production_rate_plusieurs_simulations(ListeTableauSimulation, wind
     for k in range(N):
         Moyennes.append(effective_production_rate(ListeTableauSimulation[k], window_lenght))
     return np.means(Moyennes)
+    
+def graph_effective_production_rate(ListeTableauSimulation, window_lenght):
+    taille_max = len(ListeTableauSimulation)
+    Tailles_buffer = list(range(1,taille_max+1))
+    Prod_rate =[]
+    Tmax = len(ListeTableauSimulation[0])
+
+    for k in range(N):
+        Prod_rate.append(effective_production_rate(ListeTableauSimulation[k], window_lenght))
+    plt.plot(Tailles_buffer,Prod_rate)
+    plt.xlabel("Taille du buffer")
+    plt.ylabel("Taux effectif de productoin pour une fenêtre de taille"+ str(window_lenght))
