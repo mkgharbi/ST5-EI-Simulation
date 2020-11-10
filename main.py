@@ -74,7 +74,6 @@ def generateSummarizedState(system, differenceOutput, differenceInput):
             summarizedState.append(system.getCurrentState().getState()[index].getCapacity())
     summarizedState.append(differenceOutput)
     summarizedState.append(differenceInput)
-    printSummarizedState(summarizedState)
     return summarizedState
 
 def main():
@@ -102,6 +101,7 @@ def main():
             buf.reset()
         for machine in system.getMachines():
             machine.reset()
+        system.resetHistoric()
         print("************************************")
         print("------Choosing simulation type------")
         print("--Click A: Automatic simulation")
@@ -128,8 +128,8 @@ def main():
                     differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
                     differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
                     summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
+                    system.getHistoricState().append(summarizedState)
                     instantT +=1
-
             elif(choice == 'B'):
                 while(instantT <= timeUnit):
                     print("T = " + str(instantT))

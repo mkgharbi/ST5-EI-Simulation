@@ -33,8 +33,8 @@ class System:
         self.historicState = []
         self.machines = machines
         self.buffers = buffers
-        self.historicState = []
         self.currentState = State(self.machines,self.buffers)
+        self.historicState = [[]]
     
     def getMachines(self):
         return self.machines
@@ -42,6 +42,10 @@ class System:
         return self.buffers
     def getCurrentState(self):
         return self.currentState
+    def getHistoricState(self):
+        return self.historicState
+    def resetHistoric(self):
+        self.historicState.clear()
 
 class MachineLineNode:
     
