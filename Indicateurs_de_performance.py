@@ -5,7 +5,7 @@ import numpy as np
 
 T1 = [["UP",1,3,"DOWN",0,4,"Up",4,4,"DOWN",0,1],["DOWN",1,3,"UP",1,4,"UP",4,4,"UP",0,1],["DOWN",0,3,"UP",1,4,"UP",3,4,"DOWN",1,0]]
 
-T2 = [["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN","UP",4,5,"DOWN",2,6,"DOWN",0,1],
+T2 = [["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN",4,5,"UP",4,5,"DOWN",2,6,"DOWN",0,1],
 
     ["UP",2,3,"UP",1,4,"UP",4,4,"DOWN",3,5,"UP",4,5,"DOWN",2,6,"DOWN",0,1],
     
@@ -65,7 +65,7 @@ def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
         Liste_Probas_a_t = []
         for k in range(N):
             Liste_Probas_a_t.append(proba_distrib_LT(ListeTableauSimulation[k],t))
-        Probas.append(np.mean(Liste_Probas_a_t)
+        Probas.append(np.mean(Liste_Probas_a_t))
     plt.plot(Delais,Probas)
     plt.show()
     
@@ -77,12 +77,26 @@ def work_in_progress(TableauSimulation, t):
     
     S = 0
     nb_bi = int(len(TableauSimulation[0])/3 - 1)
-    for k in range(nb_bi):  # On ne regarde que l'étape t pour compter les biens pas encore fini
-        S+=TableauSimulation[t][3*k+1]
-        
+    for k in range(nb_bi):  
+        S += TableauSimulation[t][3*k+1]  # On ne regarde que l'étape t pour compter les biens pas encore fini
     return S
     
-#  def graph_work_in_progress_  je la fais incessemment sous peu
+    
+    
+def graph_work_in_progress(TableauSimulation): 
+    Delais = []
+    Probas = []
+    Tmax = len(TableauSimulation)
+    
+    for t in range(Tmax):
+        Delais.append(t)
+        Probas.append(work_in_progress(TableauSimulation,t))
+    plt.plot(Delais,Probas)
+    plt.show()
+    
+def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
+    bientotfini = 0
+
 
 #def blocking_probability        
 #depend trop de comment seront codés les résultats de simulation pour etre implémenter maintenant
