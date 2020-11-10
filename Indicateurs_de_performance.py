@@ -11,11 +11,12 @@ T2 = [["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN",4,5,"UP",4,5,"DOWN",2,6,"DOWN",0,1],
     
     ["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN",2,5,"UP",4,5,"DOWN",2,6,"DOWN",0,1],
     
-    ["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN",1,5,"UP",4,5,"DOWN",2,6,"DOWN",1,1],
+    ["UP",1,3,"DOWN",0,4,"UP",3,4,"DOWN",1,5,"UP",4,5,"DOWN",2,6,"DOWN",1,1],
     
     ["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN",0,5,"UP",4,5,"DOWN",2,6,"DOWN",0,0],
     
     ["UP",1,3,"DOWN",0,4,"Up",4,4,"UP",1,5,"UP",4,5,"DOWN",2,6,"DOWN",1,0]]
+
 
 # PROBA DISTRIB
 
@@ -84,23 +85,74 @@ def work_in_progress(TableauSimulation, t):
     
     
 def graph_work_in_progress(TableauSimulation): 
-    Delais = []
-    Probas = []
+    Temps = []
+    Nb_piece_in_process = []
     Tmax = len(TableauSimulation)
     
     for t in range(Tmax):
-        Delais.append(t)
-        Probas.append(work_in_progress(TableauSimulation,t))
-    plt.plot(Delais,Probas)
+        Temps.append(t)
+        Nb_piece_in_process.append(work_in_progress(TableauSimulation,t))
+    plt.plot(Temps,Nb_piece_in_process)
     plt.show()
     
 def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
-    bientotfini = 0
+    Temps = []
+    Nb_piece_in_process = []
+    N = len(ListeTableauSimulation)
+    Tmax = len(ListeTableauSimulation[0])
+    
+    for t in range(Tmax):
+        Temps.append(t)
+        
+        Liste_Probas_a_t = []
+        for k in range(N):
+            Liste_Probas_a_t.append(proba_distrib_LT(ListeTableauSimulation[k],t))
+        Nb_piece_in_process.append(np.mean(Liste_Probas_a_t))
+    plt.plot(Delais,Probas)
+    plt.show()
+    
 
+# BLOCKING PROBABILITY
 
-#def blocking_probability        
-#depend trop de comment seront codés les résultats de simulation pour etre implémenter maintenant
-
+def blocking_probability(TableauSimulation,i):
+    S_full = 0
+    S = 0
+    Tmax = len(TableauSimulation)
+    for t in range(Tmax):
+        if TableauSimulation[t][3*i+1] == TableauSimulation[t][3*i+2]:
+            S_full += 1
+        S += 1
+    return S_full/S
+    
+def graph_blocking_probability(TableauSimulation): 
+    Buffer = []
+    nb_buffer = int(len(TableauSimulation[0])/3 - 1)
+    Proba_full = []    
+    
+    for i in range(nb_buffer):
+        Buffer.append(i)
+        Proba_full.append(blocking_probability(TableauSimulation,i))
+    plt.plot(Buffer,Proba_full)
+    plt.show()
+    
+def graph_blocking_probability_plusieurs_simulations(ListeTableauSimulation):
+    Buffer = []
+    nb_buffer = int(len(TableauSimulation[0])/3 - 1)
+    Proba_full = []  
+    N = len(ListeTableauSimulation)
+    
+    for i in range(nb_buffer):
+        Buffer.append(t)
+        
+        Liste_Probas_buffer_i = []
+        for k in range(N):
+            Liste_Probas_buffer_i.append(blocking_probability(ListeTableauSimulation[k],i))
+        Proba_full.append(np.mean(Liste_Probas_buffer_i))
+    plt.plot(Buffer,Proba_full)
+    plt.show()
+ 
+     
+# STRAVATION PROBABILITY
 
 
 def stravation_probability(TableauSimulation):
