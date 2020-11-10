@@ -106,9 +106,9 @@ def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
         
         Liste_Probas_a_t = []
         for k in range(N):
-            Liste_Probas_a_t.append(proba_distrib_LT(ListeTableauSimulation[k],t))
+            Liste_Probas_a_t.append(work_in_progress(ListeTableauSimulation[k],t))
         Nb_piece_in_process.append(np.mean(Liste_Probas_a_t))
-    plt.plot(Delais,Probas)
+    plt.plot(Temps,Nb_piece_in_process)
     plt.show()
     
 
@@ -137,12 +137,12 @@ def graph_blocking_probability(TableauSimulation):
     
 def graph_blocking_probability_plusieurs_simulations(ListeTableauSimulation):
     Buffer = []
-    nb_buffer = int(len(TableauSimulation[0])/3 - 1)
+    nb_buffer = int(len(ListeTableauSimulation[0][0])/3 - 1)
     Proba_full = []  
     N = len(ListeTableauSimulation)
     
     for i in range(nb_buffer):
-        Buffer.append(t)
+        Buffer.append(i)
         
         Liste_Probas_buffer_i = []
         for k in range(N):

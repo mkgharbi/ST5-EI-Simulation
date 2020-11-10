@@ -1,5 +1,5 @@
 from MachineLine import Machine, Buffer, System, INPUT_CNT_BUF, OUTPUT_CNT_BUF
-
+from Indicateurs_de_performance import *
 def probabilityBreakdownInput(j):
     while True:
         try:
@@ -98,11 +98,7 @@ def main():
     system = System(numberMachine, machineTable, bufferTable)
     historicSimulations = []
     while(1):
-        for buf in system.getBuffers():
-            buf.reset()
-        for machine in system.getMachines():
-            machine.reset()
-        system.resetHistoric()
+        
         print("************************************")
         print("------Choosing simulation type------")
         print("--Click A: Automatic simulation")
@@ -110,36 +106,49 @@ def main():
         print("--Click Q: Exit")
         choice = input("Pick your choice : ").upper()
         if (choice == "Q"):
+            #graph_proba_distrib_LT_plusieurs_simulations(historicSimulations)
+            #graph_work_in_progress_plusieurs_simulations(historicSimulations)
+            graph_blocking_probability_plusieurs_simulations(historicSimulations)
             break
         else:
             timeUnit = int(input("Enter the time slot : "))
-            instantT = 0
-            print("T = 0")
-            print(generateStringState(system))
             if (choice == "A"):
-                while(instantT < timeUnit):
-                    copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
-                    copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
-                    print("T = " + str(instantT+1))
-                    for machine in system.getMachines():
-                        machine.phase_1_rand()
-                    for machine in system.getMachines():
-                        machine.phase_2()
+                occurenceSimulation = int(input("Automation occurences : "))
+                occurence = 0
+                while (occurence < occurenceSimulation):
+                    print("Simulation: ")
+                    print("T = 0")
                     print(generateStringState(system))
-                    differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
-                    differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
-                    summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
-                    summarizedStateCopy = summarizedState[:] 
-                    system.getHistoricState().append(summarizedStateCopy)
-                    instantT +=1
+                    for buf in system.getBuffers():
+                        buf.reset()
+                    for machine in system.getMachines():
+                        machine.reset()
+                    system.resetHistoric()
+                    instantT = 0
+                    while(instantT < timeUnit):
+                        copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
+                        copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
+                        print("T = " + str(instantT+1))
+                        for machine in system.getMachines():
+                            machine.phase_1_rand()
+                        for machine in system.getMachines():
+                            machine.phase_2()
+                        print(generateStringState(system))
+                        differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
+                        differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
+                        summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
+                        summarizedStateCopy = summarizedState[:]
+                        system.getHistoricState().append(summarizedStateCopy)
+                        instantT +=1
+                    occurence += 1
+                    historicStateCopy = system.getHistoricState()[:]
+                    historicSimulations.append(historicStateCopy)
             elif(choice == 'B'):
                 while(instantT <= timeUnit):
                     print("T = " + str(instantT))
                     generatePossibleStatesFromCurrent(system)
                     choosenState = input("Choose possible state: ")
                     instantT +=1
-            historicStateCopy = system.getHistoricState()[:]
-            historicSimulations.append(historicStateCopy)
 
 if __name__ == "__main__":
     main()

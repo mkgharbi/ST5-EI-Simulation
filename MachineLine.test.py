@@ -59,5 +59,6 @@ class BufferTest(unittest.TestCase):
         self.assertEqual(self.middle_buffer.current,1)
         self.middle_buffer.pop()
         self.assertTrue(self.middle_buffer.is_empty())
+        
 if __name__ == '__main__':
     unittest.main()
