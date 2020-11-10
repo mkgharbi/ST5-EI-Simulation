@@ -27,7 +27,6 @@ def proba_distrib_LT(TableauSimulation, temps_attendu):
     T_entree = []
     T_sortie = []
     T = len(TableauSimulation)
-    
     for t in range(T):
         if TableauSimulation[t][-1] == 1:      # Si une piece rentre
             T_entree.append(t)
@@ -35,6 +34,7 @@ def proba_distrib_LT(TableauSimulation, temps_attendu):
             T_sortie.append(t)
             
     LT = []
+    
     for k in range(len(T_sortie)):
         LT.append(T_sortie[k]-T_entree[k])
     

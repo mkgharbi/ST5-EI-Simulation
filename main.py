@@ -1,5 +1,5 @@
 from MachineLine import Machine, Buffer, System, INPUT_CNT_BUF, OUTPUT_CNT_BUF
-from Indicateurs_de_performance import *
+from indicateurs_de_performance import *
 def probabilityBreakdownInput(j):
     while True:
         try:
@@ -107,8 +107,8 @@ def main():
         choice = input("Pick your choice : ").upper()
         if (choice == "Q"):
             #graph_proba_distrib_LT_plusieurs_simulations(historicSimulations)
-            #graph_work_in_progress_plusieurs_simulations(historicSimulations)
-            graph_blocking_probability_plusieurs_simulations(historicSimulations)
+            graph_work_in_progress_plusieurs_simulations(historicSimulations)
+            #graph_blocking_probability_plusieurs_simulations(historicSimulations)
             break
         else:
             timeUnit = int(input("Enter the time slot : "))

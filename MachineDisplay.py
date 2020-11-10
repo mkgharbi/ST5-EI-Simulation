@@ -1,7 +1,7 @@
 from tkinter import *
 from functools import partial
 from MachineLine import *
-from Indicateurs_de_performance import *
+from indicateurs_de_performance import *
 
 def main_window():
 
@@ -163,12 +163,6 @@ def launch_simulation(root_window,machines,buffers,time_unit):
         summarizedState.append(differenceOutput)
         summarizedState.append(differenceInput)
         return summarizedState
-    def display_lead_time_distribution():
-        pass
-    def display_total_production_rate():
-        pass
-    def display_effective_production_rate():
-        pass
     bufferTable,machineTable = [],[]
     for buffer in buffers:
         bufferTable.append(Buffer(Buffer.Type.MIDDLE,buffer[1],buffer[0]))
@@ -200,6 +194,62 @@ def launch_simulation(root_window,machines,buffers,time_unit):
         stateStrings.append(generateStringState(system))
         instantT +=1
     print(system.getHistoricState())
+    
+    def get_historic_states(number_of_simulations):
+        historicSimulations = []
+        occurence = 0
+        while (occurence < int(number_of_simulations)):
+            for buf in system.getBuffers():
+                buf.reset()
+            for machine in system.getMachines():
+                machine.reset()
+            system.resetHistoric()
+            instantT = 0
+            while(instantT < int(time_unit)):
+                copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
+                copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
+                for machine in system.getMachines():
+                    machine.phase_1_rand()
+                for machine in system.getMachines():
+                    machine.phase_2()
+                        
+                differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
+                differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
+                summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
+                summarizedStateCopy = summarizedState[:]
+                system.getHistoricState().append(summarizedStateCopy)
+                instantT +=1
+            occurence += 1
+            historicStateCopy = system.getHistoricState()[:]
+            historicSimulations.append(historicStateCopy)
+            print('historic simulations',historicSimulations)
+        return historicSimulations
+    
+    def display_lead_time_distribution():
+        popup = Tk()
+        number_of_simulations=StringVar(popup)
+
+        Label(popup,text="Nombre de simulations à effectuer : ").grid(row=0)
+        Entry(popup,textvariable=number_of_simulations).grid(row=0,column=1)
+        
+
+        def destroy():
+            graph_proba_distrib_LT_plusieurs_simulations(get_historic_states(number_of_simulations.get()))
+            popup.destroy()
+            
+
+        Grid.rowconfigure(popup,2,weight=1)
+        Button(popup,text="Lancer les simulations",command=destroy).grid(row=2)   
+        popup.wm_title("Calculer le lead time distribution")
+        popup.mainloop()
+    def display_total_production_rate():
+        pass
+    def display_effective_production_rate():
+        pass
+    def display_blocking_probability():
+        pass
+    def display_work_in_progress():
+        pass
 
     simulation_window = Toplevel(root_window)
     simulation_window.configure(background = "white")
@@ -213,6 +263,8 @@ def launch_simulation(root_window,machines,buffers,time_unit):
     Button(indicators_frame,text="Lead time distribution",bg="black",fg="snow",command=display_lead_time_distribution).grid(row=0,column=0)
     Button(indicators_frame,bg="black",fg="snow",text="Total production rate",command=display_total_production_rate).grid(row=0,column=1)
     Button(indicators_frame,bg="black",fg="snow",text="Effective production rate",command=display_effective_production_rate).grid(row=0,column=2)
+    Button(indicators_frame,bg="black",fg="snow",text="Blocking probability",command=display_blocking_probability).grid(row=0,column=3)
+    Button(indicators_frame,bg="black",fg="snow",text="Work in progress",command=display_work_in_progress).grid(row=0,column=4)
 
     simulation_frame = Frame(simulation_window,bg="white")
     simulation_frame.grid(row=1,column=0)
