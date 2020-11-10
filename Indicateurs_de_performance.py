@@ -1,18 +1,33 @@
-import random as rd    # seulement pour tester les programmes 
-p_entree = 0.9         # seulement pour tester les programmes 
-p_sortie = 0.5         # seulement pour tester les programmes
+import matplotlib.pyplot as plt
+import numpy as np
 
+# Tableau test
 
+T1 = [["UP",1,3,"DOWN",0,4,"Up",4,4,"DOWN",0,1],["DOWN",1,3,"UP",1,4,"UP",4,4,"UP",0,1],["DOWN",0,3,"UP",1,4,"UP",3,4,"DOWN",1,0]]
 
-def proba_distrib_LT(TableauMi, TableauBi, temps_attendu):
+T2 = [["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN","UP",4,5,"DOWN",2,6,"DOWN",0,1],
+
+    ["UP",2,3,"UP",1,4,"UP",4,4,"DOWN",3,5,"UP",4,5,"DOWN",2,6,"DOWN",0,1],
+    
+    ["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN",2,5,"UP",4,5,"DOWN",2,6,"DOWN",0,1],
+    
+    ["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN",1,5,"UP",4,5,"DOWN",2,6,"DOWN",1,1],
+    
+    ["UP",1,3,"DOWN",0,4,"UP",4,4,"DOWN",0,5,"UP",4,5,"DOWN",2,6,"DOWN",0,0],
+    
+    ["UP",1,3,"DOWN",0,4,"Up",4,4,"UP",1,5,"UP",4,5,"DOWN",2,6,"DOWN",1,0]]
+
+# PROBA DISTRIB
+
+def proba_distrib_LT(TableauSimulation, temps_attendu):
     T_entree = []
     T_sortie = []
-    T = len(TableauMi)
+    T = len(TableauSimulation)
     
     for t in range(T):
-        if rd.random() < p_entree:    # Si une piece rentre, condition à modifier
+        if TableauSimulation[t][-1] == 1:      # Si une piece rentre
             T_entree.append(t)
-        if rd.random() < p_sortie:    # Si une piece sort, condition à modifier
+        if TableauSimulation[t][-2] == 1:      # Si une piece sort
             T_sortie.append(t)
             
     LT = []
@@ -27,45 +42,77 @@ def proba_distrib_LT(TableauMi, TableauBi, temps_attendu):
     Proba_temps_attendu = S/len(LT)  #Nombre de pieces fabriquées avec le temps_attendu diviser par nombre total de pieces sorties
     return Proba_temps_attendu
     
+def graph_proba_distrib_LT(TableauSimulation):
+    Delais = []
+    Probas = []
+    Tmax = len(TableauSimulation)
     
+    for t in range(Tmax):
+        Delais.append(t)
+        Probas.append(proba_distrib_LT(TableauSimulation,t))
+    plt.plot(Delais,Probas)
+    plt.show()
     
-def work_in_progress(TableauBi, t):
+def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
+    Delais = []
+    Probas = []
+    N = len(ListeTableauSimulation)
+    Tmax = len(ListeTableauSimulation[0])
+    
+    for t in range(Tmax):
+        Delais.append(t)
+        
+        Liste_Probas_a_t = []
+        for k in range(N):
+            Liste_Probas_a_t.append(proba_distrib_LT(ListeTableauSimulation[k],t))
+        Probas.append(np.mean(Liste_Probas_a_t)
+    plt.plot(Delais,Probas)
+    plt.show()
+    
+
+    
+# WORK IN PROGRESS
+    
+def work_in_progress(TableauSimulation, t):
     
     S = 0
-    for bi in TableauBi[t]:  # On ne regarde que l'étape t pour compter les biens pas encore fini
-        S+=bi
+    nb_bi = int(len(TableauSimulation[0])/3 - 1)
+    for k in range(nb_bi):  # On ne regarde que l'étape t pour compter les biens pas encore fini
+        S+=TableauSimulation[t][3*k+1]
         
     return S
     
-    
+#  def graph_work_in_progress_  je la fais incessemment sous peu
 
 #def blocking_probability        
 #depend trop de comment seront codés les résultats de simulation pour etre implémenter maintenant
 
 
 
-def stravation_probability(TableauBi):
+def stravation_probability(TableauSimulation):
     S = 0
     S_empty = 0
+    T = len(TableauSimulation)
+    nb_bi = int(len(TableauSimulation[0])/3 - 1)
     
-    for bi in TableauBi:
-        if bi==0:
-            S_empty+=1
-        S+=1
-        
+    for t in range(T):
+        for k in range(nb_bi):
+            if TableauSimulation[t][3*k+1] == 0:
+                S_empty += 1
+            S += 1
     return S_empty/S
     
     
     
-def total_production_rate(TableauMi, TableauBi, window_lenght):
-    T = len(TableauMi)
+def total_production_rate(TableauSimulation, window_lenght):
+    T = len(TableauSimulation)
     wl = window_lenght
     nb_exit = 0
-    
+
     t = 0
-    while t < T - wl:
+    while t <= T - wl:
         for tau in range(t,t+wl):
-            if True:               # Si une piece sort, condition à changer
+            if TableauSimulation[tau][-1] == 1:                 # Si une piece sort
                 nb_exit+=1
         t+=1
         
@@ -73,27 +120,27 @@ def total_production_rate(TableauMi, TableauBi, window_lenght):
     
     
 
-def effective_production_rate(TableauMi, TableauBi, window_lenght):
+def effective_production_rate(TableauSimulation, window_lenght):
     T_entree = []
     T_sortie = []
-    T = len(TableauMi)
+    T = len(TableauSimulation)
     
     for t in range(T):
-        if rd.random() < p_entree:    # Si une piece rentre, condition à modifier
+        if TableauSimulation[t][-1] == 1:    # Si une piece rentre
             T_entree.append(t)
-        if rd.random() < p_sortie:    # Si une piece sort, condition à modifier
+        if TableauSimulation[t][-2] == 1:    # Si une piece sort
             T_sortie.append(t)
 
     wl = window_lenght
     nb_exit = 0
     
     t = 0
-    while t < T - wl :
-        for tau in range(t,t+window_lenght):
-            if t in T_sortie :
-                k = T_sortie.index(t) 
+    while t <= T - wl :
+        for tau in range(t,t+wl):
+            if tau in T_sortie :
+                k = T_sortie.index(tau) 
                 lt= T_sortie[k] - T_entree[k]
-                if lt < wl:
+                if lt <= wl:
                     nb_exit +=1
         t+=1
         
