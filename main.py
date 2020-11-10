@@ -96,6 +96,7 @@ def main():
         else:  
             machineTable.append(Machine(breakdown_prob,repair_prob,bufferTable[j-1],bufferTable[j],"Machine"+str(j+1)))
     system = System(numberMachine, machineTable, bufferTable)
+    historicSimulations = [[]]
     while(1):
         for buf in system.getBuffers():
             buf.reset()
@@ -128,7 +129,8 @@ def main():
                     differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
                     differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
                     summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
-                    system.getHistoricState().append(summarizedState)
+                    summarizedStateCopy = summarizedState[:] 
+                    system.getHistoricState().append(summarizedStateCopy)
                     instantT +=1
             elif(choice == 'B'):
                 while(instantT <= timeUnit):
@@ -136,6 +138,8 @@ def main():
                     generatePossibleStatesFromCurrent(system)
                     choosenState = input("Choose possible state: ")
                     instantT +=1
+            historicStateCopy = system.getHistoricState()[:]
+            historicSimulations.append(historicStateCopy)
 
 if __name__ == "__main__":
     main()
