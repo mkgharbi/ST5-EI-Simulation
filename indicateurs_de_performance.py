@@ -72,6 +72,8 @@ def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
         Probas.append(np.mean(Liste_Probas_a_t))
     plt.plot(Delais,Probas)
     plt.show()
+    plt.xlabel("unité de temps")
+    plt.ylabel("Probabilité du lead time")
     
 
     
@@ -96,22 +98,44 @@ def graph_work_in_progress(TableauSimulation):
         Nb_piece_in_process.append(work_in_progress(TableauSimulation,t))
     plt.plot(Temps,Nb_piece_in_process)
     plt.show()
+    plt.xlabel("unité de temps")
+    plt.ylabel("nombre de pièces en cours de traitement")
     
-def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
-    Temps = []
-    Nb_piece_in_process = []
+def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation, taille_max):
+    L = [] * taille_max
     N = len(ListeTableauSimulation)
     Tmax = len(ListeTableauSimulation[0])
+
+    for k in range(N):
+        i = ListeTableauSimulation[k][2]
+        wip = work_in_progress(ListeTableauSimulation[k],Tmax-1) 
+        L[i].append(wip)
     
-    for t in range(Tmax):
-        Temps.append(t)
-        
-        Liste_Probas_a_t = []
-        for k in range(N):
-            Liste_Probas_a_t.append(work_in_progress(ListeTableauSimulation[k],t))
-        Nb_piece_in_process.append(np.mean(Liste_Probas_a_t))
-    plt.plot(Temps,Nb_piece_in_process)
+    Tailles_buffer = [ k for k in range(taille_max)]
+    WIP = [ np.mean(L[k]) for k in range(taille_max)]
+ 
+    plt.plot(Tailles_buffer,WIP)
     plt.show()
+    plt.xlabel("Taille du buffer")
+    plt.ylabel("nombre de pièces en cours de traitement")
+    
+def graph_throughput_plusieurs_simulations(ListeTableauSimulation, taille_max):
+    L = [] * taille_max
+    N = len(ListeTableauSimulation)
+    Tmax = len(ListeTableauSimulation[0])
+
+    for k in range(N):
+        i = ListeTableauSimulation[k][2]
+        wip = work_in_progress(ListeTableauSimulation[k],Tmax-1) 
+        L[i].append(wip)
+    
+    Tailles_buffer = [ k for k in range(taille_max)]
+    WIP = [ np.mean(L[k]) for k in range(taille_max)]
+ 
+    plt.plot(Tailles_buffer,WIP)
+    plt.show()
+    plt.xlabel("Taille du buffer")
+    plt.ylabel("nombre de pièces en cours de traitement")
     
 
 # BLOCKING PROBABILITY
@@ -137,6 +161,8 @@ def graph_blocking_probability(TableauSimulation):
         Proba_full.append(blocking_probability(TableauSimulation,i))
     plt.plot(Buffer,Proba_full)
     plt.show()
+    plt.xlabel("numero du buffer")
+    plt.ylabel("Proba d'être ")
     
 def graph_blocking_probability_plusieurs_simulations(ListeTableauSimulation):
     Buffer = []
