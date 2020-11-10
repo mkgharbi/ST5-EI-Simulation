@@ -96,7 +96,7 @@ def main():
         else:  
             machineTable.append(Machine(breakdown_prob,repair_prob,bufferTable[j-1],bufferTable[j],"Machine"+str(j+1)))
     system = System(numberMachine, machineTable, bufferTable)
-    historicSimulations = [[]]
+    historicSimulations = []
     while(1):
         for buf in system.getBuffers():
             buf.reset()
