@@ -71,8 +71,9 @@ def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
             Liste_Probas_a_t.append(proba_distrib_LT(ListeTableauSimulation[k],t))
         Probas.append(np.mean(Liste_Probas_a_t))
     plt.plot(Delais,Probas)
+    plt.xlabel("unité de temps")
+    plt.ylabel("Probabilité du lead time")
     plt.show()
-    
 
     
 # WORK IN PROGRESS
@@ -95,25 +96,55 @@ def graph_work_in_progress(TableauSimulation):
         Temps.append(t)
         Nb_piece_in_process.append(work_in_progress(TableauSimulation,t))
     plt.plot(Temps,Nb_piece_in_process)
+    plt.xlabel("unité de temps")
+    plt.ylabel("nombre de pièces en cours de traitement")
     plt.show()
     
-def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
-    Temps = []
-    Nb_piece_in_process = []
+def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation, taille_max):
+    L = [] * taille_max
     N = len(ListeTableauSimulation)
     Tmax = len(ListeTableauSimulation[0])
+
+    for k in range(N):
+        i = ListeTableauSimulation[k][2]
+        wip = work_in_progress(ListeTableauSimulation[k],Tmax-1) 
+        L[i].append(wip)
     
-    for t in range(Tmax):
-        Temps.append(t)
-        
-        Liste_Probas_a_t = []
-        for k in range(N):
-            Liste_Probas_a_t.append(work_in_progress(ListeTableauSimulation[k],t))
-        Nb_piece_in_process.append(np.mean(Liste_Probas_a_t))
-    plt.plot(Temps,Nb_piece_in_process)
+    Tailles_buffer = [ k for k in range(taille_max)]
+    WIP = [ np.mean(L[k]) for k in range(taille_max)]
+ 
+    plt.plot(Tailles_buffer,WIP)
+    plt.xlabel("Taille du buffer")
+    plt.ylabel("nombre de pièces en cours de traitement")
     plt.show()
     
+def troughput(TableauSimulation):
+    S = 0
+    Tmax = len(TableauSimulation)
+    
+    for t in range(Tmax):
+        S += TableauSimulation[t][-2]
+    return S
 
+def graph_throughput_plusieurs_simulations(ListeTableauSimulation, taille_max):
+    L = [] * taille_max
+    N = len(ListeTableauSimulation)
+    Tmax = len(ListeTableauSimulation[0])
+
+    for k in range(N):
+        i = ListeTableauSimulation[k][2]
+        troughput = troughput(ListeTableauSimulation[k]) 
+        L[i].append(wip)
+    
+    Tailles_buffer = [ k for k in range(taille_max)]
+    tp = [ np.mean(L[k]) for k in range(taille_max)]
+ 
+    plt.plot(Tailles_buffer,tp)
+    plt.xlabel("Taille du buffer")
+    plt.ylabel("Nombre de pièces terminées")
+    plt.show()
+
+    
 # BLOCKING PROBABILITY
 
 
@@ -136,6 +167,8 @@ def graph_blocking_probability(TableauSimulation):
         Buffer.append(i)
         Proba_full.append(blocking_probability(TableauSimulation,i))
     plt.plot(Buffer,Proba_full)
+    plt.xlabel("numero du buffer")
+    plt.ylabel("Proba d'être ")
     plt.show()
     
 def graph_blocking_probability_plusieurs_simulations(ListeTableauSimulation):
@@ -220,7 +253,29 @@ def total_production_rate_plusieurs_simulations(ListeTableauSimulation, window_l
     
     for k in range(N):
         Moyennes.append(total_production_rate(ListeTableauSimulation[k], window_lenght))
-    return np.means(Moyennes)
+    return np.mean(Moyennes)
+    
+# def graph_total_production_rate(ListeTableauSimulation, window_lenght):
+#     Tailles_bufffer = []
+#     Prod_rate =[]
+#     N = len(ListeTableauSimulation)
+#     Tmax = len(ListeTableauSimulation[0])
+# 
+#     for k in range(N):
+#         Tailles_buffer.append(k+1)
+#         
+#         
+#         troughput = troughput(ListeTableauSimulation[k]) 
+#         L[i].append(wip)
+#     
+#     Tailles_buffer = [ k for k in range(taille_max)]
+#     tp = [ np.mean(L[k]) for k in range(taille_max)]
+#  
+#     plt.plot(Tailles_buffer,tp)
+#     plt.xlabel("Taille du buffer")
+#     plt.ylabel("Nombre de pièces terminées")
+#     plt.show()
+
 
 
 # EFFECTIVE PRODUCTION RATE
@@ -253,7 +308,7 @@ def effective_production_rate(TableauSimulation, window_lenght):
         
     return nb_exit / t
     
-def total_production_rate_plusieurs_simulations(ListeTableauSimulation, window_lenght):
+def effective_production_rate_plusieurs_simulations(ListeTableauSimulation, window_lenght):
     Moyennes = []
     N = len(ListeTableauSimulation)
     
