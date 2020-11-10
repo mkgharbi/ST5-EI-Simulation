@@ -3,13 +3,28 @@ from random import random
 
 P = lambda x: random() < x
 
-def generateState(machines, buffers):
-    state =[]
-    for i in range(len(machines)):
-        state.append(machines[i])
-        if (i < len(machines)-1):
-            state.append(buffers[i])
-    return state
+class State:
+    def __init__(self,machines,buffers):
+        self.state = self.generateState(machines,buffers)
+        
+
+    def generateState(self,machines, buffers):
+        state =[]
+        for i in range(len(machines)):
+            state.append(machines[i])
+            if (i < len(machines)-1):
+                state.append(buffers[i])
+        return state
+    
+    def getState(self):
+        return self.state
+
+    def __str__(self):
+        result = 'State = ( '
+        for state in range(self.state):
+            result += str(state)
+        result += ' )'
+        return f'{result}'
 
 class System:
     def __init__(self, numberMachine, machines, buffers):
@@ -18,7 +33,8 @@ class System:
         self.historicState = []
         self.machines = machines
         self.buffers = buffers
-        self.currentState = generateState(self.machines,self.buffers)
+        self.historicState = []
+        self.currentState = State(self.machines,self.buffers)
     
     def getMachines(self):
         return self.machines
@@ -47,8 +63,14 @@ class Machine (MachineLineNode):
     def reset (self):
         self.is_up = True
 
-    def is_blocked (self):
+    def switchIs_Up(self):
+        self.is_up = not self.is_up    
+    def setIs_Up(self, value):
+        self.is_up = value
+    def getIs_Up(self):
+        return self.is_up
 
+    def is_blocked (self):
         return self.downstream.is_full() or self.upstream.is_empty()
     
     def phase_1_rand (self):
@@ -118,6 +140,12 @@ class Buffer (MachineLineNode):
         if self.type in [Buffer.Type.MIDDLE, Buffer.Type.OUTPUT_COUNTER]:
             self.current += 1
 
+    def getCurrent(self):
+        return self.current
+
+    def getCapacity(self):
+        return self.capacity
+    
     def __str__ (self):
         if self.type == Buffer.Type.MIDDLE:
             return f', {self.name}' + f' - {self.current}/{self.capacity}, '

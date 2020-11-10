@@ -20,19 +20,62 @@ def probabilityRepairInput(j):
         except ValueError:
             print("Input must be numeric.")
 
+def bufferInput(j):
+    while True:
+        try:
+            firstInput = int(input("Enter the buffer size of buffer " + str(j+1) + " : "))
+            if 1 <= firstInput:
+                return (firstInput)
+            print("Please try again, it must be equal or greater to 1")
+        except ValueError:
+            print("Input must be integer.")
+
 def generateStringState(system):
     result = 'State = ( '
-    for i in range(len(system.getCurrentState())):
-        result += str(system.getCurrentState()[i])
+    for i in range(len(system.getCurrentState().getState())):
+        result += str(system.getCurrentState().getState()[i])
     result += ' )'
     return result
 
-def generatePossibleStatesFromCurrent(system):
+def generation(system):
     possibleNextStates = []
-    print(generateStringState(system, possibleNextStates))
-    print("Possible states :")
+    for i in range(len(system.getMachines())-1):
+        copySystem = system
+        if (i == 0):
+            copySystem.getMachines()[i].switchIs_Up()
+            possibleNextStates.append(copySystem.getCurrentState())
+        else: 
+            if (copySystem.getBuffers()[i].is_empty()):
+                copySystem.getMachines()[i+1].setIs_Up(True)
+            else:
+                copySystem.getMachines()[i+1].switchIs_Up()
+            possibleNextStates.append(copySystem.getCurrentState())
+    return possibleNextStates
     
-    #possibleNextStates.append()
+
+def generatePossibleStatesFromCurrent(system):
+    print(generateStringState(system))
+    print("Possible states :")
+    # Complete : facon de visualiser la liste des events franchissables : toutes combinaisons des events courants
+    possibleStates = generation(system)
+    print(possibleStates)
+    # possibleNextStates.append(): 
+def printSummarizedState(summarizedState):
+    for element in summarizedState:
+        print(element)
+
+def generateSummarizedState(system, differenceOutput, differenceInput):
+    summarizedState = []
+    for index in range(len(system.getCurrentState().getState())):
+        if (index % 2 == 0): # Machine case 
+            summarizedState.append(system.getCurrentState().getState()[index].getIs_Up())
+        else: # buffer case 
+            summarizedState.append(system.getCurrentState().getState()[index].getCurrent())
+            summarizedState.append(system.getCurrentState().getState()[index].getCapacity())
+    summarizedState.append(differenceOutput)
+    summarizedState.append(differenceInput)
+    printSummarizedState(summarizedState)
+    return summarizedState
 
 def main():
     print("------Simulation------")
@@ -41,7 +84,7 @@ def main():
     machine = []
     bufferTable = []
     for i in range(numberMachine-1) :
-        sizei = input("Enter the buffer size of Buffer" + str(i+1) + " : ")
+        sizei = bufferInput(i)
         bufferTable.append(Buffer(Buffer.Type.MIDDLE,sizei,'Buffer'+str(i+1)))
     machineTable = []
     for j in range(numberMachine):
@@ -55,6 +98,10 @@ def main():
             machineTable.append(Machine(breakdown_prob,repair_prob,bufferTable[j-1],bufferTable[j],"Machine"+str(j+1)))
     system = System(numberMachine, machineTable, bufferTable)
     while(1):
+        for buf in system.getBuffers():
+            buf.reset()
+        for machine in system.getMachines():
+            machine.reset()
         print("************************************")
         print("------Choosing simulation type------")
         print("--Click A: Automatic simulation")
@@ -66,22 +113,29 @@ def main():
         else:
             timeUnit = int(input("Enter the time slot : "))
             instantT = 0
+            print("T = 0")
+            print(generateStringState(system))
             if (choice == "A"):
-                while(instantT <= timeUnit):
-                    print("T = " + str(instantT))
+                while(instantT < timeUnit):
+                    copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
+                    copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
+                    print("T = " + str(instantT+1))
                     for machine in system.getMachines():
                         machine.phase_1_rand()
                     for machine in system.getMachines():
                         machine.phase_2()
                     print(generateStringState(system))
+                    differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
+                    differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
+                    summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
                     instantT +=1
+
             elif(choice == 'B'):
                 while(instantT <= timeUnit):
                     print("T = " + str(instantT))
                     generatePossibleStatesFromCurrent(system)
                     choosenState = input("Choose possible state: ")
                     instantT +=1
-
 
 if __name__ == "__main__":
     main()
