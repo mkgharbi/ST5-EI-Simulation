@@ -1,8 +1,9 @@
 from tkinter import *
 from functools import partial
-from MachineLine import *
-from indicateurs_de_performance import *
-
+from Machine import *
+from PerformanceIndicator import *
+from Buffer import *
+from System import *
 def main_window():
 
     machines=[]
@@ -236,7 +237,6 @@ def launch_simulation(root_window,machines,buffers,time_unit):
         def destroy():
             graph_proba_distrib_LT_plusieurs_simulations(get_historic_states(number_of_simulations.get()))
             popup.destroy()
-            
 
         Grid.rowconfigure(popup,2,weight=1)
         Button(popup,text="Lancer les simulations",command=destroy).grid(row=2)   

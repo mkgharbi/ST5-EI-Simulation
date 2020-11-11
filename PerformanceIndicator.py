@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 # Tableaux test
 
 T1 = [[True,1,3,False,0,4,True,4,4,False,0,1],
