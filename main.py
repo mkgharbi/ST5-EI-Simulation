@@ -1,41 +1,8 @@
-from MachineLine import Machine, Buffer, System, INPUT_CNT_BUF, OUTPUT_CNT_BUF
-from indicateurs_de_performance import *
-def probabilityBreakdownInput(j):
-    while True:
-        try:
-            firstInput = float(input("Enter the breakdown probability of machine " + str(j+1) + " : "))
-            if 0 <= firstInput <= 1:
-                return (firstInput)
-            print("Please try again, it must be a number between 0 and 1")
-        except ValueError:
-            print("Input must be numeric.")
-
-def probabilityRepairInput(j):
-    while True:
-        try:
-            firstInput = float(input("Enter the repair probability of machine " + str(j+1) + " : "))
-            if 0 <= firstInput <= 1:
-                return (firstInput)
-            print("Please try again, it must be a number between 0 and 1")
-        except ValueError:
-            print("Input must be numeric.")
-
-def bufferInput(j):
-    while True:
-        try:
-            firstInput = int(input("Enter the buffer size of buffer " + str(j+1) + " : "))
-            if 1 <= firstInput:
-                return (firstInput)
-            print("Please try again, it must be equal or greater to 1")
-        except ValueError:
-            print("Input must be integer.")
-
-def generateStringState(system):
-    result = 'State = ( '
-    for i in range(len(system.getCurrentState().getState())):
-        result += str(system.getCurrentState().getState()[i])
-    result += ' )'
-    return result
+from PerformanceIndicator import *
+from SharedFunctions import *
+from Buffer import *
+from System import System
+from Machine import Machine
 
 def generation(system):
     possibleNextStates = []
@@ -52,30 +19,6 @@ def generation(system):
             possibleNextStates.append(copySystem.getCurrentState())
     return possibleNextStates
     
-
-def generatePossibleStatesFromCurrent(system):
-    print(generateStringState(system))
-    print("Possible states :")
-    # Complete : facon de visualiser la liste des events franchissables : toutes combinaisons des events courants
-    possibleStates = generation(system)
-    print(possibleStates)
-    # possibleNextStates.append(): 
-def printSummarizedState(summarizedState):
-    for element in summarizedState:
-        print(element)
-
-def generateSummarizedState(system, differenceOutput, differenceInput):
-    summarizedState = []
-    for index in range(len(system.getCurrentState().getState())):
-        if (index % 2 == 0): # Machine case 
-            summarizedState.append(system.getCurrentState().getState()[index].getIs_Up())
-        else: # buffer case 
-            summarizedState.append(system.getCurrentState().getState()[index].getCurrent())
-            summarizedState.append(system.getCurrentState().getState()[index].getCapacity())
-    summarizedState.append(differenceOutput)
-    summarizedState.append(differenceInput)
-    return summarizedState
-
 def main():
     print("------Simulation------")
     print("---Creating the System")
@@ -111,8 +54,8 @@ def main():
             #graph_blocking_probability_plusieurs_simulations(historicSimulations)
             break
         else:
-            timeUnit = int(input("Enter the time slot : "))
             if (choice == "A"):
+                timeUnit = int(input("Enter the time slot : "))
                 occurenceSimulation = int(input("Automation occurences : "))
                 occurence = 0
                 while (occurence < occurenceSimulation):
@@ -144,11 +87,36 @@ def main():
                     historicStateCopy = system.getHistoricState()[:]
                     historicSimulations.append(historicStateCopy)
             elif(choice == 'B'):
-                while(instantT <= timeUnit):
+                instantT = 0
+                while(True):
                     print("T = " + str(instantT))
-                    generatePossibleStatesFromCurrent(system)
-                    choosenState = input("Choose possible state: ")
-                    instantT +=1
+                    print(generateStringState(system))
+                    print("Click S : Skip the one-step Simulation: ")
+                    print("Click C : Go to" + str(instantT+1) + " time in the one-step Simulation: ")
+                    print("Click any other input : Stop the simulation")
+                    choiceManual = input("Make your choice: ").upper()
+                    if (choiceManual == "C"):
+                        for machine in system.getMachines():
+                            machine.phase_1_rand()
+                        for machine in system.getMachines():
+                            machine.phase_2()
+                        instantT +=1
+                    elif(choiceManual == "S"):
+                        print("Choose the final time to stop the simulation ")
+                        finalTime = int(input("Enter the final time"))
+                        while(instantT <= finalTime):
+                            instantT += 1
+                            print("T = " + str(instantT))
+                            print(generateStringState(system))
+                            for machine in system.getMachines():
+                                machine.phase_1_rand()
+                            for machine in system.getMachines():
+                                machine.phase_2()
+                        break
+                    else:
+                        break
+
+                        
 
 if __name__ == "__main__":
     main()
