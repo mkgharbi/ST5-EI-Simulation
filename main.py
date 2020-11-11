@@ -54,8 +54,8 @@ def main():
             #graph_blocking_probability_plusieurs_simulations(historicSimulations)
             break
         else:
-            timeUnit = int(input("Enter the time slot : "))
             if (choice == "A"):
+                timeUnit = int(input("Enter the time slot : "))
                 occurenceSimulation = int(input("Automation occurences : "))
                 occurence = 0
                 while (occurence < occurenceSimulation):
@@ -87,11 +87,36 @@ def main():
                     historicStateCopy = system.getHistoricState()[:]
                     historicSimulations.append(historicStateCopy)
             elif(choice == 'B'):
-                while(instantT <= timeUnit):
-                    print("T = 0")
+                instantT = 0
+                while(True):
+                    print("T = " + str(instantT))
                     print(generateStringState(system))
-                    print("print N to go to the next state: ")
-                    instantT +=1
+                    print("Click S : Skip the one-step Simulation: ")
+                    print("Click C : Go to" + str(instantT+1) + " time in the one-step Simulation: ")
+                    print("Click any other input : Stop the simulation")
+                    choiceManual = input("Make your choice: ").upper()
+                    if (choiceManual == "C"):
+                        for machine in system.getMachines():
+                            machine.phase_1_rand()
+                        for machine in system.getMachines():
+                            machine.phase_2()
+                        instantT +=1
+                    elif(choiceManual == "S"):
+                        print("Choose the final time to stop the simulation ")
+                        finalTime = int(input("Enter the final time"))
+                        while(instantT <= finalTime):
+                            instantT += 1
+                            print("T = " + str(instantT))
+                            print(generateStringState(system))
+                            for machine in system.getMachines():
+                                machine.phase_1_rand()
+                            for machine in system.getMachines():
+                                machine.phase_2()
+                        break
+                    else:
+                        break
+
+                        
 
 if __name__ == "__main__":
     main()

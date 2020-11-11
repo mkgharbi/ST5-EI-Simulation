@@ -24,8 +24,6 @@ def incrementBufferSize(system):
     for bufferElement in system.getBuffers():
         bufferElement.incrementCapacity()
 
-    
-
 def main():
     print("------Simulation------")
     print("---Creating the System")
@@ -71,11 +69,10 @@ def main():
                     instantT +=1
                     historicStateCopy = system.getHistoricState()[:]
                     historicSimulations.append(historicStateCopy)
-        
                 simulationCounter +=1
-            
         elif(choice == "B"):
             print("TODO")
+            
         elif(choice == "Q"):
             break
 
