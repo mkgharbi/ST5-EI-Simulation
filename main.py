@@ -62,21 +62,14 @@ def main():
                     print("Simulation: ")
                     print("T = 0")
                     print(generateStringState(system))
-                    for buf in system.getBuffers():
-                        buf.reset()
-                    for machine in system.getMachines():
-                        machine.reset()
-                    system.resetHistoric()
+                    resetTables(system)
                     instantT = 0
                     while(instantT < timeUnit):
                         copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
                         copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
                         print("T = " + str(instantT+1))
-                        for machine in system.getMachines():
-                            machine.phase_1_rand()
-                        for machine in system.getMachines():
-                            machine.phase_2()
-                        print(generateStringState(system))
+                        simulatingAStep(system)
+                        print(generateStringState(system)) 
                         differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
                         differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
                         summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
@@ -96,22 +89,16 @@ def main():
                     print("Click any other input : Stop the simulation")
                     choiceManual = input("Make your choice: ").upper()
                     if (choiceManual == "C"):
-                        for machine in system.getMachines():
-                            machine.phase_1_rand()
-                        for machine in system.getMachines():
-                            machine.phase_2()
+                        simulatingAStep(system)
                         instantT +=1
                     elif(choiceManual == "S"):
                         print("Choose the final time to stop the simulation ")
                         finalTime = int(input("Enter the final time"))
-                        while(instantT <= finalTime):
+                        while(instantT < finalTime):
                             instantT += 1
                             print("T = " + str(instantT))
                             print(generateStringState(system))
-                            for machine in system.getMachines():
-                                machine.phase_1_rand()
-                            for machine in system.getMachines():
-                                machine.phase_2()
+                            simulatingAStep(system)
                         break
                     else:
                         break

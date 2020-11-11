@@ -3,8 +3,8 @@ from PerformanceIndicator import *
 from SharedFunctions import *
 from System import System
 from Buffer import *
-MAXSIMULATIONBUFFERINCREMENTED = 50
 
+MAXSIMULATIONBUFFERINCREMENTED = 50
 
 def creationSystemCommonBuffer(numberMachine, machineTable, bufferTable):
     for i in range(numberMachine-1) :
@@ -24,6 +24,44 @@ def incrementBufferSize(system):
     for bufferElement in system.getBuffers():
         bufferElement.incrementCapacity()
 
+def incrementMachineProbability(system,indexInMachineTable ,variableChoice, probabilityValue):
+    if (variableChoice % 2 == 1):
+        system.getMachines()[indexInMachineTable].setRepairProbability(probabilityValue)
+    else:
+        system.getMachines()[indexInMachineTable].setBreakdownProbability(probabilityValue)
+
+def generateVariableOptions(machineNumber):
+    possibleOptions = machineNumber*2
+    machineIndex = 1
+    for i in range(1,possibleOptions+1):
+        if (i % 2 == 1):
+            print("Click " + str(i) + " : Variate only the breakdown probability of the machine " + str(machineIndex))
+        else :
+            print("Click " + str(i) + " : Variate only the repair probability of the machine " + str(machineIndex))
+            machineIndex += 1 
+
+def ChoosingPrabilities(indexInMachineTable, choiceVariable, numberMachine, machineTable, bufferTable):
+    for j in range(numberMachine):
+        breakdown_prob = 0
+        repair_prob = 0
+        if (j == indexInMachineTable):
+            if (choiceVariable % 2 == 1):
+                breakdown_prob = 0.01
+                repair_prob = probabilityRepairInput(j)
+            else:
+                repair_prob = 0.01
+                breakdown_prob = probabilityBreakdownInput(j)
+        else: 
+            breakdown_prob = probabilityBreakdownInput(j)
+            repair_prob = probabilityRepairInput(j)
+        if (j == 0):
+            machineTable.append(Machine(breakdown_prob,repair_prob,INPUT_CNT_BUF,bufferTable[j],"Machine1"))
+        elif (j == numberMachine-1):
+            machineTable.append(Machine(breakdown_prob,repair_prob,bufferTable[j-1],OUTPUT_CNT_BUF,"Machine"+str(j+1)))
+        else:  
+            machineTable.append(Machine(breakdown_prob,repair_prob,bufferTable[j-1],bufferTable[j],"Machine"+str(j+1))) 
+    return machineTable
+
 def main():
     print("------Simulation------")
     print("---Creating the System")
@@ -37,6 +75,8 @@ def main():
         print("--Click Q: Exit")
         choice = input("Make your choice: ").upper()
         if (choice == "A"):
+            bufferTable.clear()
+            machineTable.clear()
             historicSimulations = []
             system = creationSystemCommonBuffer(numberMachine, machineTable, bufferTable)
             timeSlot = int(input("Enter time slot of the simulation: "))
@@ -55,11 +95,11 @@ def main():
                 while(instantT < timeSlot):
                     copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
                     copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
-                    print("T = " + str(instantT+1))
                     for machine in system.getMachines():
                         machine.phase_1_rand()
                     for machine in system.getMachines():
                         machine.phase_2()
+                    print("T = " + str(instantT+1))
                     print(generateStringState(system))
                     differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
                     differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
@@ -71,8 +111,47 @@ def main():
                     historicSimulations.append(historicStateCopy)
                 simulationCounter +=1
         elif(choice == "B"):
-            print("TODO")
-            
+            bufferTable.clear()
+            machineTable.clear()
+            for i in range(numberMachine-1) :
+                sizei = bufferInput(i)
+                bufferTable.append(Buffer(Buffer.Type.MIDDLE,sizei,'Buffer'+str(i+1)))
+            print("Choose which variable to change")
+            generateVariableOptions(numberMachine)
+            while(True):
+                choiceVariable = int(input("Choose which variable: "))
+                if choiceVariable in range(1, numberMachine*2 + 1):
+                    indexMachine = choiceVariable
+                    if (choiceVariable % 2 == 1):
+                        indexMachine = choiceVariable + 1
+                    indexInMachineTable = int((indexMachine / 2) - 1)
+                    machineTable = ChoosingPrabilities(indexInMachineTable,choiceVariable,numberMachine,machineTable,bufferTable)
+                    system = System(numberMachine,machineTable,bufferTable)
+                    timeSlot = int(input("Enter time slot of the simulation: "))
+                    probabilityValue = 0.01
+                    while(probabilityValue < 1 or probabilityValue == 1):
+                        print("----------")
+                        print("Simulation: " + str(probabilityValue))
+                        incrementMachineProbability(system,indexInMachineTable ,choiceVariable, probabilityValue)
+                        instantT = 0
+                        print("T = 0")
+                        print(generateStringState(system))
+                        while(instantT < timeSlot):
+                            copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
+                            copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
+                            simulatingAStep(system)
+                            print("T = " + str(instantT+1))
+                            print(generateStringState(system))
+                            differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
+                            differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
+                            summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
+                            summarizedStateCopy = summarizedState[:]
+                            system.getHistoricState().append(summarizedStateCopy)
+                            instantT += 1
+                        probabilityValue += 0.01
+                    break
+                else:
+                    print("Choose a number from those proposed ")
         elif(choice == "Q"):
             break
 

@@ -51,6 +51,12 @@ class Machine (MachineLineNode):
         if self.release:
             self.downstream.push()
     
+    def setBreakdownProbability(self, value):
+        self.up_to_down = value
+    
+    def setRepairProbability(self, value):
+        self.down_to_up = value
+    
     def __str__ (self):
         return f'{self.name}' + f' - {"UP" if self.is_up else "DOWN"}'
  
