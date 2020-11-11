@@ -3,7 +3,7 @@ from PerformanceIndicator import *
 from SharedFunctions import *
 from System import System
 from Buffer import *
-MAXSIMULATIONBUFFERINCREMENTED = 30
+MAXSIMULATIONBUFFERINCREMENTED = 50
 
 
 def creationSystemCommonBuffer(numberMachine, machineTable, bufferTable):
