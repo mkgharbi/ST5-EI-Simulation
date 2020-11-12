@@ -16,10 +16,10 @@ T2 = [[True,1,3,False,0,4,True,4,4,False,4,5,True,4,5,False,2,6,False,0,1],
       [True,1,3,False,0,4,True,4,4,True,1,5,True,4,5,False,2,6,False,1,0]]
 
 T3 = [[True,1,3,False,0,4,True,4,4,False,4,5,True,4,5,False,2,6,False,0,1],
-      [True,2,3,True,1,4,True,4,4,False,3,5,True,4,5,False,2,6,False,0,1],    
+      [True,2,3,True,1,4,True,4,4,False,3,5,True,4,5,False,2,6,False,1,1],    
       [True,1,3,False,0,4,True,4,4,False,2,5,True,4,5,False,2,6,False,0,1],    
       [True,1,3,False,0,4,True,3,4,False,1,5,True,4,5,False,2,6,False,1,1],    
-      [True,1,3,False,0,4,True,4,4,False,0,5,True,4,5,False,2,6,False,0,0],    
+      [True,1,3,False,0,4,True,4,4,False,0,5,True,4,5,False,2,6,False,1,1],    
       [True,1,3,False,0,4,True,4,4,True,3,5,True,4,5,False,6,6,False,1,0]]
 
 
@@ -106,6 +106,10 @@ def work_in_progress(TableauSimulation,t):
     nb_bi = int(len(TableauSimulation[0])/3 - 1)
     for k in range(nb_bi):  
         S += TableauSimulation[t][3*k+1]  
+        
+    for i in range(nb_bi+1):
+        if not TableauSimulation[t][3*i]:
+            S+=1
     return S
     
 def graph_work_in_progress(TableauSimulation): 
@@ -134,7 +138,7 @@ def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation, nb_simu
             WIP.append(np.mean(wip))
             wip = []
     
-    plt.plot(Tailles_buffer, WIP, label = "Nombre de pièces en cours de traitement")
+    plt.plot(Tailles_buffer, WIP, label = "WIP pour "+str(nb_simulation) + " simulations")
     plt.xlabel("Taille du buffer")
     plt.legend()
     
@@ -152,7 +156,7 @@ def graph_WIP_p1_p2_r1_r2(ListeTableauSimulation, nb_simulation, parametre_contr
             WIP.append(np.mean(wip))
             wip = []
     
-    plt.plot(Proba, WIP, label="WIP en fonction de " + parametre_controle)
+    plt.plot(Proba, WIP, label="WIP en fonction de " + parametre_controle+" pour "+ str(nb_simulation) + " simulations")
     plt.ylabel("WIP")
     plt.legend()
     
@@ -182,7 +186,7 @@ def graph_throughput_plusieurs_simulations(ListeTableauSimulation, nb_simulation
             Thoughputs.append(np.mean(thoughputs))
             thoughputs = []
     
-    plt.plot(Tailles_buffer, Thoughputs, label = "nombre de pièces terminées")
+    plt.plot(Tailles_buffer, Thoughputs, label = "throughtput pour "+str(nb_simulation)+ " simulations")
     plt.xlabel("Taille du buffer")
     plt.legend()
     
@@ -308,7 +312,7 @@ def graph_total_production_rate(ListeTableauSimulation, wl):
             Prod_rate.append(np.mean(prod_rate))
             prod_rate = []
         
-    plt.plot(Tailles_buffer, Prod_rate, label = "Taux de production total pour une fenêtre de taille"+ str(wl))
+    plt.plot(Tailles_buffer, Prod_rate, label = "Taux de production total pour une fenêtre de "+ str(wl))
     plt.xlabel("Taille du buffer")
     plt.legend()
 
@@ -364,7 +368,7 @@ def graph_effective_production_rate(ListeTableauSimulation, wl, nb_simul):
             EEFF.append(np.mean(eeff))
             eeff = []
         
-    plt.plot(Tailles_buffer, EEFF, label = "Taux effectif de production pour une fenêtre de taille"+ str(wl))
+    plt.plot(Tailles_buffer, EEFF, label = "Taux effectif de production pour une fenêtre de taille "+ str(wl)+" et "+str(nb_simul)+" simulations")
     plt.xlabel("Taille du buffer")
     plt.legend()
 
@@ -381,7 +385,7 @@ def graph_effective_production_rate_r1(ListeTableauSimulation, wl, buf_size, nb_
             Eeff.append(np.mean(eeff))
             eeff = []
     
-    plt.plot(Probas, Eeff, label = "B = " + str(buf_size))
+    plt.plot(Probas, Eeff, label = "B = " + str(buf_size) )
     plt.xlabel("r1")
     plt.ylabel("Effective production rate")
     plt.legend()
