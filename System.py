@@ -8,7 +8,6 @@ class System:
         self.machines = machines
         self.buffers = buffers
         self.currentState = State(self.machines,self.buffers)
-        self.historicState = [[]]
     
     def getMachines(self):
         return self.machines
