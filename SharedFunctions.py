@@ -47,3 +47,17 @@ def generateSummarizedState(system, differenceOutput, differenceInput):
     summarizedState.append(differenceOutput)
     summarizedState.append(differenceInput)
     return summarizedState
+
+
+def simulatingAStep(system):
+    for machine in system.getMachines():
+        machine.phase_1_rand()
+    for machine in system.getMachines():
+        machine.phase_2()
+
+def resetTables(system):
+    for buf in system.getBuffers():
+        buf.reset()
+    for machine in system.getMachines():
+        machine.reset()
+    system.resetHistoric()
