@@ -15,6 +15,13 @@ T2 = [[True,1,3,False,0,4,True,4,4,False,4,5,True,4,5,False,2,6,False,0,1],
       [True,1,3,False,0,4,True,4,4,False,0,5,True,4,5,False,2,6,False,0,0],    
       [True,1,3,False,0,4,True,4,4,True,1,5,True,4,5,False,2,6,False,1,0]]
 
+T3 = [[True,1,3,False,0,4,True,4,4,False,4,5,True,4,5,False,2,6,False,0,1],
+      [True,2,3,True,1,4,True,4,4,False,3,5,True,4,5,False,2,6,False,0,1],    
+      [True,1,3,False,0,4,True,4,4,False,2,5,True,4,5,False,2,6,False,0,1],    
+      [True,1,3,False,0,4,True,3,4,False,1,5,True,4,5,False,2,6,False,1,1],    
+      [True,1,3,False,0,4,True,4,4,False,0,5,True,4,5,False,2,6,False,0,0],    
+      [True,1,3,False,0,4,True,4,4,True,3,5,True,4,5,False,6,6,False,1,0]]
+
 
 # PROBA DISTRIB
 
@@ -288,20 +295,22 @@ def total_production_rate_plusieurs_simulations(ListeTableauSimulation, window_l
         Moyennes.append(total_production_rate(ListeTableauSimulation[k], window_lenght))
     return np.mean(Moyennes)
     
-def graph_total_production_rate(ListeTableauSimulation, window_lenght):
-    taille_max = len(ListeTableauSimulation)
+def graph_total_production_rate(ListeTableauSimulation, wl):
+    N = len(ListeTableauSimulation)
     Tailles_buffer = []
     Prod_rate =[]
-    Tmax = len(ListeTableauSimulation[0])
+    prod_rate = []
 
-    for k in range(taille_max):
-        Tailles_buffer.append(k+1)
-        Prod_rate.append(total_production_rate(ListeTableauSimulation[k], window_lenght))
+    for k in range(N):
+        prod_rate.append(effective_production_rate(ListeTableauSimulation[k],wl))
+        if k % nb_simul == nb_simul-1:
+            Tailles_buffer.append((k+1)/nb_simul)
+            Prod_rate.append(np.mean(prod_rate))
+            prod_rate = []
         
-    plt.plot(Tailles_buffer,Prod_rate)
+    plt.plot(Tailles_buffer, Prod_rate, label = "Taux de production total pour une fenêtre de taille"+ str(wl))
     plt.xlabel("Taille du buffer")
-    plt.ylabel("Taux de productoin pour une fenêtre de taille"+ str(window_lenght))
-
+    plt.legend()
 
 
 # EFFECTIVE PRODUCTION RATE
@@ -342,28 +351,37 @@ def effective_production_rate_plusieurs_simulations(ListeTableauSimulation, wind
         Moyennes.append(effective_production_rate(ListeTableauSimulation[k], window_lenght))
     return np.means(Moyennes)
     
-def graph_effective_production_rate(ListeTableauSimulation, window_lenght):
-    taille_max = len(ListeTableauSimulation)
+def graph_effective_production_rate(ListeTableauSimulation, wl, nb_simul):
+    N = len(ListeTableauSimulation)
     Tailles_buffer = []
-    Prod_rate =[]
+    eeff = []
+    EEFF =[]
 
-    for k in range(taille_max):
-        Tailles_buffer.append(k+1)
-        Prod_rate.append(effective_production_rate(ListeTableauSimulation[k], window_lenght))
+    for k in range(N):
+        eeff.append(effective_production_rate(ListeTableauSimulation[k],wl))
+        if k % nb_simul == nb_simul-1:
+            Tailles_buffer.append((k+1)/nb_simul)
+            EEFF.append(np.mean(eeff))
+            eeff = []
         
-    plt.plot(Tailles_buffer, Prod_rate, label = "Taux effectif de production pour une fenêtre de taille"+ str(window_lenght))
+    plt.plot(Tailles_buffer, EEFF, label = "Taux effectif de production pour une fenêtre de taille"+ str(wl))
     plt.xlabel("Taille du buffer")
     plt.legend()
 
-def graph_effective_production_rate_r1(ListeTableauSimulation, window_lenght, taille_du_buffer):
+def graph_effective_production_rate_r1(ListeTableauSimulation, wl, buf_size, nb_simul):
     N = len(ListeTableauSimulation)
-    Probas = [k/100 for k in range(2,40)]
+    eeff = []
     Eeff = []
+    Probas = []
     
     for k in range(N):
-        Eeff.append(effective_production_rate(ListeTableauSimulation[k], window_lenght))
-        
-    plt.plot(Probas, Eeff, label = "B = " + str(taille_du_buffer))
+        eeff.append(effective_production_rate(ListeTableauSimulation[k], wl))
+        if k % nb_simul == nb_simul-1:
+            Probas.append(0.01*(k+1)/nb_simul)
+            Eeff.append(np.mean(eeff))
+            eeff = []
+    
+    plt.plot(Probas, Eeff, label = "B = " + str(buf_size))
     plt.xlabel("r1")
     plt.ylabel("Effective production rate")
     plt.legend()
