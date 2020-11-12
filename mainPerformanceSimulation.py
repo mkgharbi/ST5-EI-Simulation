@@ -3,7 +3,7 @@ from PerformanceIndicator import *
 from SharedFunctions import *
 from System import System
 from Buffer import *
-
+from indicateurs_de_performance import *
 MAXSIMULATIONBUFFERINCREMENTED = 50
 
 def creationSystemCommonBuffer(numberMachine, machineTable, bufferTable):
@@ -26,9 +26,9 @@ def incrementBufferSize(system):
 
 def incrementMachineProbability(system,indexInMachineTable ,variableChoice, probabilityValue):
     if (variableChoice % 2 == 1):
-        system.getMachines()[indexInMachineTable].setRepairProbability(probabilityValue)
+        system.getMachines()[indexInMachineTable].setBreakdownProbability(probabilityValue)   
     else:
-        system.getMachines()[indexInMachineTable].setBreakdownProbability(probabilityValue)
+        system.getMachines()[indexInMachineTable].setRepairProbability(probabilityValue)
 
 def generateVariableOptions(machineNumber):
     possibleOptions = machineNumber*2
@@ -68,6 +68,7 @@ def main():
     numberMachine = int(input("Enter the number of machines: "))
     machineTable = []
     bufferTable = []
+    historicSimulations = []
     while(True):
         print("---Choose type of calculation")
         print("--Click A: Increment buffer size by one unit")
@@ -77,42 +78,46 @@ def main():
         if (choice == "A"):
             bufferTable.clear()
             machineTable.clear()
-            historicSimulations = []
+            historicSimulations.clear()
             system = creationSystemCommonBuffer(numberMachine, machineTable, bufferTable)
             timeSlot = int(input("Enter time slot of the simulation: "))
             simulationCounter = 1
             while(simulationCounter <= MAXSIMULATIONBUFFERINCREMENTED):
                 system.setCommonCapacity(simulationCounter)
-                print("Simulation: ")
-                print("T = 0")
-                print(generateStringState(system))
-                for buf in system.getBuffers():
-                    buf.reset()
-                for machine in system.getMachines():
-                    machine.reset()
-                system.resetHistoric()
-                instantT = 0
-                while(instantT < timeSlot):
-                    copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
-                    copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
-                    for machine in system.getMachines():
-                        machine.phase_1_rand()
-                    for machine in system.getMachines():
-                        machine.phase_2()
-                    print("T = " + str(instantT+1))
+                simulation = 0
+                while(simulation < 1000):
+                    print("Simulation: ")
+                    print("T = 0")
                     print(generateStringState(system))
-                    differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
-                    differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
-                    summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
-                    summarizedStateCopy = summarizedState[:]
-                    system.getHistoricState().append(summarizedStateCopy)
-                    instantT +=1
+                    for buf in system.getBuffers():
+                        buf.reset()
+                    for machine in system.getMachines():
+                        machine.reset()
+                    system.resetHistoric()
+                    instantT = 0
+                    while(instantT < timeSlot):
+                        copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
+                        copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
+                        for machine in system.getMachines():
+                            machine.phase_1_rand()
+                        for machine in system.getMachines():
+                            machine.phase_2()
+                        print("T = " + str(instantT+1))
+                        print(generateStringState(system))
+                        differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
+                        differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
+                        summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
+                        summarizedStateCopy = summarizedState[:]
+                        system.getHistoricState().append(summarizedStateCopy)
+                        instantT +=1
                     historicStateCopy = system.getHistoricState()[:]
                     historicSimulations.append(historicStateCopy)
+                    simulation += 1
                 simulationCounter +=1
         elif(choice == "B"):
             bufferTable.clear()
             machineTable.clear()
+            historicSimulations.clear()
             for i in range(numberMachine-1) :
                 sizei = bufferInput(i)
                 bufferTable.append(Buffer(Buffer.Type.MIDDLE,sizei,'Buffer'+str(i+1)))
@@ -122,9 +127,10 @@ def main():
                 choiceVariable = int(input("Choose which variable: "))
                 if choiceVariable in range(1, numberMachine*2 + 1):
                     indexMachine = choiceVariable
-                    if (choiceVariable % 2 == 1):
+                    if (choiceVariable % 2 == 1): # Breakdown proba
                         indexMachine = choiceVariable + 1
-                    indexInMachineTable = int((indexMachine / 2) - 1)
+                    indexInMachineTable = int(indexMachine / 2) - 1
+                    print(indexInMachineTable)
                     machineTable = ChoosingPrabilities(indexInMachineTable,choiceVariable,numberMachine,machineTable,bufferTable)
                     system = System(numberMachine,machineTable,bufferTable)
                     timeSlot = int(input("Enter time slot of the simulation: "))
@@ -133,26 +139,38 @@ def main():
                         print("----------")
                         print("Simulation: " + str(probabilityValue))
                         incrementMachineProbability(system,indexInMachineTable ,choiceVariable, probabilityValue)
-                        instantT = 0
-                        print("T = 0")
-                        print(generateStringState(system))
-                        while(instantT < timeSlot):
-                            copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
-                            copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
-                            simulatingAStep(system)
-                            print("T = " + str(instantT+1))
+                        nbSimulation = 0
+                        while(nbSimulation < 100):
+                            instantT = 0
+                            print("T = 0")
                             print(generateStringState(system))
-                            differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
-                            differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
-                            summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
-                            summarizedStateCopy = summarizedState[:]
-                            system.getHistoricState().append(summarizedStateCopy)
-                            instantT += 1
+                            while(instantT < timeSlot):
+                                copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
+                                copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
+                                simulatingAStep(system)
+                                print("T = " + str(instantT+1))
+                                print(generateStringState(system))
+                                differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
+                                differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
+                                summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
+                                summarizedStateCopy = summarizedState[:]
+                                system.getHistoricState().append(summarizedStateCopy)
+                                instantT +=1
+                            historicStateCopy = system.getHistoricState()[:]
+                            historicSimulations.append(historicStateCopy)
+                            nbSimulation += 1
                         probabilityValue += 0.01
                     break
                 else:
                     print("Choose a number from those proposed ")
         elif(choice == "Q"):
+            print(len(historicSimulations))
+            # Done : graph_work_in_progress_plusieurs_simulations(historicSimulations, 1000)
+            # Done :graph_throughput_plusieurs_simulations(historicSimulations,1000)
+            #graph_WIP_p1_p2_r1_r2(historicSimulations,100,"r2")
+            # Done :graph_total_production_rate(historicSimulations, 5, 1000)
+            #graph_effective_production_rate(historicSimulations,5,1000)
+            plt.show()
             break
 
 
