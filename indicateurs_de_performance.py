@@ -161,22 +161,25 @@ def throughput(TableauSimulation):
         S += TableauSimulation[t][-2]
     return S
 
-def graph_throughput_plusieurs_simulations(ListeTableauSimulation):
+def graph_throughput_plusieurs_simulations(ListeTableauSimulation, nb_simulation):
     Tailles_buffer = []
     N = len(ListeTableauSimulation)
     Tmax = len(ListeTableauSimulation[0])
     Thoughputs = []
+    thoughputs = []
 
     for k in range(N):
-        Tailles_buffer.append(k+1)
-        Thoughputs.append(throughput(ListeTableauSimulation[k])) 
+        thoughputs.append(throughput(ListeTableauSimulation[k]))
+        if k % nb_simulation == nb_simulation-1:
+            Tailles_buffer.append((k+1)/nb_simulation)
+            Thoughputs.append(np.mean(thoughputs))
+            thoughputs = []
     
     plt.plot(Tailles_buffer, Thoughputs, label = "nombre de pièces terminées")
     plt.xlabel("Taille du buffer")
     plt.legend()
     
 
-    
 # BLOCKING PROBABILITY
 
 
