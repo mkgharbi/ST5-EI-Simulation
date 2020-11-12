@@ -113,7 +113,7 @@ def graph_work_in_progress(TableauSimulation):
     plt.xlabel("unité de temps")
     plt.ylabel("nombre de pièces en cours de traitement")
     
-def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
+def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation, nb_simulation):
     N = len(ListeTableauSimulation)
     Tmax = len(ListeTableauSimulation[0])
     WIP = []
@@ -122,8 +122,8 @@ def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
     
     for k in range(N):
         wip.append(work_in_progress(ListeTableauSimulation[k],Tmax-1))
-        if k%100 == 99:
-            Tailles_buffer.append((k+1)/100)
+        if k % nb_simulation == nb_simulation-1:
+            Tailles_buffer.append((k+1)/nb_simulation)
             WIP.append(np.mean(wip))
             wip = []
     
