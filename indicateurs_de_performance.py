@@ -117,11 +117,17 @@ def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
     N = len(ListeTableauSimulation)
     Tmax = len(ListeTableauSimulation[0])
     WIP = []
+    wip = []
     Tailles_buffer = []
-
+    
+    i = 0
     for k in range(N):
-        Tailles_buffer.append(k+1)
-        WIP.append(work_in_progress(ListeTableauSimulation[k],Tmax-1))
+        wip.append(work_in_progress(ListeTableauSimulation[k],Tmax-1))
+        if i%10 == 9:
+            Tailles_buffer.append((k+1)/10)
+            WIP.append(np.mean(wip))
+            wip = []
+        i+=1
     
     plt.plot(Tailles_buffer, WIP, label = "Nombre de pièces en cours de traitement")
     plt.xlabel("Taille du buffer")
@@ -353,7 +359,7 @@ def graph_effective_production_rate_r1(ListeTableauSimulation, window_lenght, ta
         
     plt.plot(Probas, Eeff, label = "B = " + str(taille_du_buffer))
     plt.xlabel("r1")
-    plt.ylabel("Effective produuction rate")
+    plt.ylabel("Effective production rate")
     plt.legend()
 
     
