@@ -120,14 +120,12 @@ def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
     wip = []
     Tailles_buffer = []
     
-    i = 0
     for k in range(N):
         wip.append(work_in_progress(ListeTableauSimulation[k],Tmax-1))
-        if i%10 == 9:
-            Tailles_buffer.append((k+1)/10)
+        if k%100 == 99:
+            Tailles_buffer.append((k+1)/100)
             WIP.append(np.mean(wip))
             wip = []
-        i+=1
     
     plt.plot(Tailles_buffer, WIP, label = "Nombre de pièces en cours de traitement")
     plt.xlabel("Taille du buffer")
