@@ -49,8 +49,11 @@ def main():
         print("--Click Q: Exit")
         choice = input("Pick your choice : ").upper()
         if (choice == "Q"):
-            graph_proba_distrib_LT_plusieurs_simulations(historicSimulations)
-            #graph_work_in_progress_plusieurs_simulations(historicSimulations)
+            #graph_proba_distrib_LT_plusieurs_simulations(historicSimulations)
+            #graph_work_in_progress(historicSimulations)
+            graph_blocking_probability_plusieurs_simulations(historicSimulations)
+            graph_stravation_probability_plusieurs_simulations(historicSimulations)
+            plt.show()
             #graph_blocking_probability_plusieurs_simulations(historicSimulations)
             break
         else:
