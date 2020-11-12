@@ -295,7 +295,7 @@ def total_production_rate_plusieurs_simulations(ListeTableauSimulation, window_l
         Moyennes.append(total_production_rate(ListeTableauSimulation[k], window_lenght))
     return np.mean(Moyennes)
     
-def graph_total_production_rate(ListeTableauSimulation, wl, nb_simul):
+def graph_total_production_rate(ListeTableauSimulation, wl):
     N = len(ListeTableauSimulation)
     Tailles_buffer = []
     Prod_rate =[]
@@ -308,7 +308,7 @@ def graph_total_production_rate(ListeTableauSimulation, wl, nb_simul):
             Prod_rate.append(np.mean(prod_rate))
             prod_rate = []
         
-    plt.plot(Tailles_buffer, Prod_rate, label = "Taux de production total pour une fenêtre de taille "+ str(wl))
+    plt.plot(Tailles_buffer, Prod_rate, label = "Taux de production total pour une fenêtre de taille"+ str(wl))
     plt.xlabel("Taille du buffer")
     plt.legend()
 
