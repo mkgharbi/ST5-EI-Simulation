@@ -131,14 +131,19 @@ def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation, nb_simu
     plt.xlabel("Taille du buffer")
     plt.legend()
     
-def graph_WIP_p1_p2_r1_r2(ListeTableauSimulation, parametre_controle):
-    WIP = []
-    Proba = [ k/100 for k in range(1,101)]
+def graph_WIP_p1_p2_r1_r2(ListeTableauSimulation, nb_simulation, parametre_controle ):
     N = len(ListeTableauSimulation)
-    T = len(ListeTableauSimulation[0])
+    Tmax = len(ListeTableauSimulation[0])
+    WIP = []
+    wip = []
+    Proba = []
     
     for k in range(N):
-        WIP.append(work_in_progress(ListeTableauSimulation[k],T-1))
+        wip.append(work_in_progress(ListeTableauSimulation[k],Tmax-1))
+        if k % nb_simulation == nb_simulation-1:
+            Proba.append(0.01*(k+1)/nb_simulation)
+            WIP.append(np.mean(wip))
+            wip = []
     
     plt.plot(Proba, WIP, label="WIP en fonction de " + parametre_controle)
     plt.ylabel("WIP")
