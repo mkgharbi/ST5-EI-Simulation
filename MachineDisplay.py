@@ -10,6 +10,8 @@ def main_window():
     buffers=[]
     def add_buffer():
         popup = Tk()
+        
+        
         name=StringVar(popup)
         capacity=StringVar(popup)
 
@@ -21,13 +23,17 @@ def main_window():
 
         def destroy():
             """Validation des entrées"""
-            if((len(capacity.get())>0 and  len(name.get())>0)and (float(capacity.get()).is_integer())):
-                
-                buffers.append((name.get(),int(capacity.get())))
+            if(len(machines)==0):
                 popup.destroy()
-                display_machine()
-            else:
-                invalid_entry_warning()
+                add_machine()
+            else: 
+                if((len(capacity.get())>0 and  len(name.get())>0)and (float(capacity.get()).is_integer())):
+                    
+                    buffers.append((name.get(),int(capacity.get())))
+                    popup.destroy()
+                    add_machine()
+                else:
+                    invalid_entry_warning()
             
 
         Grid.rowconfigure(popup,2,weight=1)
@@ -35,8 +41,12 @@ def main_window():
             
             
         popup.wm_title("Ajout d'un buffer")
-        popup.mainloop()
-
+        if(len(machines)==0):
+            destroy()
+        else : 
+            popup.mainloop()
+        
+        
     def add_machine():
         popup = Tk()
 
@@ -57,10 +67,7 @@ def main_window():
             if((len(breakdown_prob.get())>0 and len(repair_prob.get())>0 and len(name.get())>0)and (float(breakdown_prob.get())<=1 and float(breakdown_prob.get())>=0) and (float(repair_prob.get())<=1 and float(repair_prob.get())>=0)):
                 machines.append((name.get(),float(breakdown_prob.get()),float(repair_prob.get())))
                 popup.destroy()
-                if(len(machines)>1):
-                    add_buffer()
-                else:
-                    display_machine()
+                display_machine()
                     
             else:
                 invalid_entry_warning()
@@ -139,7 +146,7 @@ def main_window():
                 Label(machine_frame,bg="white",fg="red",text=format_machine_display(machines[i+1])).grid(row=2*(i+1))
 
     
-    add_machine_button = Button(button_frame,text="Ajouter une machine", bg = "black", fg = "snow",command=add_machine)
+    add_machine_button = Button(button_frame,text="Ajouter une machine", bg = "black", fg = "snow",command=add_buffer)
     add_machine_button.textcolor = "snow"
     add_machine_button.grid(row=0,column=0)
 
@@ -167,14 +174,14 @@ def launch_simulation(root_window,machines,buffers,time_unit):
     bufferTable,machineTable = [],[]
     for buffer in buffers:
         bufferTable.append(Buffer(Buffer.Type.MIDDLE,buffer[1],buffer[0]))
-    machineTable.append(Machine(machines[0][1],machines[0][2],INPUT_BUF,bufferTable[0],machines[0][0]))
+    machineTable.append(Machine(machines[0][1],machines[0][2],INPUT_CNT_BUF,bufferTable[0],machines[0][0]))
     for i in range(1,len(machines)-1):
         machine = machines[i]
         
         machineTable.append(Machine(machine[1],machine[2],bufferTable[i-1],bufferTable[i],machine[0]))
         
-    machineTable.append(Machine(machines[-1][1],machines[-1][2],bufferTable[-1],OUTPUT_BUF,machines[-1][0]))
-    print(bufferTable,machineTable)
+    machineTable.append(Machine(machines[-1][1],machines[-1][2],bufferTable[-1],OUTPUT_CNT_BUF,machines[-1][0]))
+    
     system = System(len(machineTable), machineTable, bufferTable)
     instantT = 0
     stateStrings=[]
@@ -194,7 +201,6 @@ def launch_simulation(root_window,machines,buffers,time_unit):
         system.getHistoricState().append(summarizedStateCopy)
         stateStrings.append(generateStringState(system))
         instantT +=1
-    print(system.getHistoricState())
     
     def get_historic_states(number_of_simulations):
         historicSimulations = []
@@ -204,6 +210,8 @@ def launch_simulation(root_window,machines,buffers,time_unit):
                 buf.reset()
             for machine in system.getMachines():
                 machine.reset()
+            OUTPUT_CNT_BUF.reset()
+            INPUT_CNT_BUF.reset()
             system.resetHistoric()
             instantT = 0
             while(instantT < int(time_unit)):
@@ -212,10 +220,10 @@ def launch_simulation(root_window,machines,buffers,time_unit):
                 for machine in system.getMachines():
                     machine.phase_1_rand()
                 for machine in system.getMachines():
-                    machine.phase_2()
-                        
+                    machine.phase_2()  
                 differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
                 differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
+                
                 summarizedState = generateSummarizedState(system,differenceOutput,differenceInput)
                 summarizedStateCopy = summarizedState[:]
                 system.getHistoricState().append(summarizedStateCopy)
@@ -223,7 +231,7 @@ def launch_simulation(root_window,machines,buffers,time_unit):
             occurence += 1
             historicStateCopy = system.getHistoricState()[:]
             historicSimulations.append(historicStateCopy)
-            print('historic simulations',historicSimulations)
+            
         return historicSimulations
     
     def display_lead_time_distribution():
@@ -245,11 +253,113 @@ def launch_simulation(root_window,machines,buffers,time_unit):
     def display_total_production_rate():
         pass
     def display_effective_production_rate():
-        pass
+        popup = Tk()
+        number_of_simulations=StringVar(popup)
+        window_lenght=StringVar(popup)
+
+        Label(popup,text="Nombre de simulations à effectuer : ").grid(row=0)
+        Entry(popup,textvariable=number_of_simulations).grid(row=0,column=1)
+        Label(popup,text="Taille de la fenêtre : ").grid(row=1)
+        Entry(popup,textvariable=window_lenght).grid(row=1,column=1)
+        
+
+        def destroy():
+            Prod_rate = effective_production_rate_plusieurs_simulations(get_historic_states(number_of_simulations.get()),int(window_lenght.get()))
+            Tailles_buffer = [i+1 for i in range(time_unit)]
+            plt.plot(Tailles_buffer, Prod_rate, label = "Taux effectif de production pour une fenêtre de taille"+ str(window_lenght.get()))
+            plt.xlabel("Taille du buffer")
+            plt.legend()
+            popup.destroy()
+
+        Grid.rowconfigure(popup,2,weight=1)
+        Button(popup,text="Lancer les simulations",command=destroy).grid(row=2)   
+        popup.wm_title("Calculer l'effective production rate")
+        popup.mainloop()
+        
     def display_blocking_probability():
-        pass
+        popup = Tk()
+        number_of_simulations=StringVar(popup)
+
+        Label(popup,text="Nombre de simulations à effectuer : ").grid(row=0)
+        Entry(popup,textvariable=number_of_simulations).grid(row=0,column=1)
+        
+
+        def destroy():
+            graph_blocking_probability_plusieurs_simulations(get_historic_states(number_of_simulations.get()))
+            plt.show()
+            popup.destroy()
+
+        Grid.rowconfigure(popup,2,weight=1)
+        Button(popup,text="Lancer les simulations",command=destroy).grid(row=2)   
+        popup.wm_title("Calculer la blocking probability")
+        popup.mainloop()
+    def get_historic_states_buffer(number_of_simulations):
+        WIP = []
+        
+        for buffer_size in range(1,51):
+            localBufferTable=[Buffer(Buffer.Type.MIDDLE,buffer_size,"Test Buffer")]
+            machines = system.getMachines()
+            localMachineTable =[]
+            localMachineTable.append(Machine(machines[0].up_to_down,machines[0].down_to_up,INPUT_CNT_BUF,localBufferTable[0],"Machine 1"))
+        
+            localMachineTable.append(Machine(machines[0].up_to_down,machines[0].down_to_up,localBufferTable[0],OUTPUT_CNT_BUF,"Machine 2"))
+        
+    
+            localSystem = System(2, localMachineTable, localBufferTable)
+            occurence = 0
+            fixed_buffer_size_wip=[]    
+            while (occurence < int(number_of_simulations)):
+                for buf in localSystem.getBuffers():
+                    buf.reset()
+                for machine in localSystem.getMachines():
+                    machine.reset()
+                OUTPUT_CNT_BUF.reset()
+                INPUT_CNT_BUF.reset()
+                localSystem.resetHistoric()
+                instantT = 0
+                fixed_buffer_size_state=[]
+                while(instantT < int(time_unit)):
+                    copyOutputValue = OUTPUT_CNT_BUF.getCurrent()
+                    copyInputValue = abs(INPUT_CNT_BUF.getCurrent())
+                    for machine in localSystem.getMachines():
+                        machine.phase_1_rand()
+                    for machine in localSystem.getMachines():
+                        machine.phase_2()  
+                    differenceOutput = OUTPUT_CNT_BUF.getCurrent() - copyOutputValue
+                    differenceInput = abs(INPUT_CNT_BUF.getCurrent()) - copyInputValue
+                    
+                    summarizedState = generateSummarizedState(localSystem,differenceOutput,differenceInput)
+                    summarizedStateCopy = summarizedState[:]
+                    fixed_buffer_size_state.append(summarizedStateCopy)
+                    localSystem.getHistoricState().append(summarizedStateCopy)
+                    instantT +=1
+                fixed_buffer_size_wip.append(work_in_progress(fixed_buffer_size_state,int(time_unit)-1))
+                occurence += 1
+                historicStateCopy = localSystem.getHistoricState()[:]
+                
+            WIP.append(np.mean(fixed_buffer_size_wip))
+        return WIP
     def display_work_in_progress():
-        pass
+        popup = Tk()
+        number_of_simulations=StringVar(popup)
+
+        Label(popup,text="Nombre de simulations à effectuer : ").grid(row=0)
+        Entry(popup,textvariable=number_of_simulations).grid(row=0,column=1)
+        
+
+        def destroy():
+            Tailles_buffer = [i+1 for i in range(1,51)]
+            WIP = (get_historic_states_buffer(number_of_simulations.get()))
+            plt.plot(Tailles_buffer, WIP, label = "Nombre de pièces en cours de traitement")
+            plt.xlabel("Taille du buffer")
+            plt.legend()
+            plt.show()
+            popup.destroy()
+
+        Grid.rowconfigure(popup,2,weight=1)
+        Button(popup,text="Lancer les simulations",command=destroy).grid(row=2)   
+        popup.wm_title("Calculer le work in progress pour des capacités de buffer de 1 à 50")
+        popup.mainloop()
 
     simulation_window = Toplevel(root_window)
     simulation_window.configure(background = "white")
@@ -261,10 +371,10 @@ def launch_simulation(root_window,machines,buffers,time_unit):
     indicators_frame.grid(row=0,column=0)
 
     Button(indicators_frame,text="Lead time distribution",bg="black",fg="snow",command=display_lead_time_distribution).grid(row=0,column=0)
-    Button(indicators_frame,bg="black",fg="snow",text="Total production rate",command=display_total_production_rate).grid(row=0,column=1)
-    Button(indicators_frame,bg="black",fg="snow",text="Effective production rate",command=display_effective_production_rate).grid(row=0,column=2)
-    Button(indicators_frame,bg="black",fg="snow",text="Blocking probability",command=display_blocking_probability).grid(row=0,column=3)
-    Button(indicators_frame,bg="black",fg="snow",text="Work in progress",command=display_work_in_progress).grid(row=0,column=4)
+    #Button(indicators_frame,bg="black",fg="snow",text="Total production rate",command=display_total_production_rate).grid(row=0,column=1)
+    #Button(indicators_frame,bg="black",fg="snow",text="Effective production rate",command=display_effective_production_rate).grid(row=0,column=2)
+    #Button(indicators_frame,bg="black",fg="snow",text="Blocking probability",command=display_blocking_probability).grid(row=0,column=3)
+    Button(indicators_frame,bg="black",fg="snow",text="Work in progress",command=display_work_in_progress).grid(row=0,column=1)
 
     simulation_frame = Frame(simulation_window,bg="white")
     simulation_frame.grid(row=1,column=0)
@@ -286,8 +396,6 @@ def launch_simulation(root_window,machines,buffers,time_unit):
             child.destroy()
         Label(simulation_details_frame,text=stateStrings[index],bg="white").grid(row=0)
         Label(simulation_details_frame,bg="white",text="Work in progress : "+str(work_in_progress(system.getHistoricState()[1:],index))).grid(row=1)
-        Label(simulation_details_frame,bg="white",text="Starvation probability : "+str(stravation_probability(system.getHistoricState()[1:]))).grid(row=2)
-        Label(simulation_details_frame,bg="white",text="Blocking probability : "+str(blocking_probability(system.getHistoricState()[1:],index))).grid(row=3)
         
     
      

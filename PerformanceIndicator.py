@@ -96,6 +96,7 @@ def graph_LT_p1_p2_r1_r2(ListeTableauSimulation, proba_controlee):
 def work_in_progress(TableauSimulation,t):
     S = 0
     nb_bi = int(len(TableauSimulation[0])/3 - 1)
+    
     for k in range(nb_bi):  
         S += TableauSimulation[t][3*k+1]  # On ne regarde que l'étape t pour compter les biens pas encore fini
     return S
