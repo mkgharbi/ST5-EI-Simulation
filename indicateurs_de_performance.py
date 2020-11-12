@@ -113,28 +113,37 @@ def graph_work_in_progress(TableauSimulation):
     plt.xlabel("unité de temps")
     plt.ylabel("nombre de pièces en cours de traitement")
     
-def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation):
+def graph_work_in_progress_plusieurs_simulations(ListeTableauSimulation, nb_simulation):
     N = len(ListeTableauSimulation)
     Tmax = len(ListeTableauSimulation[0])
     WIP = []
+    wip = []
     Tailles_buffer = []
-
+    
     for k in range(N):
-        Tailles_buffer.append(k+1)
-        WIP.append(work_in_progress(ListeTableauSimulation[k],Tmax-1))
+        wip.append(work_in_progress(ListeTableauSimulation[k],Tmax-1))
+        if k % nb_simulation == nb_simulation-1:
+            Tailles_buffer.append((k+1)/nb_simulation)
+            WIP.append(np.mean(wip))
+            wip = []
     
     plt.plot(Tailles_buffer, WIP, label = "Nombre de pièces en cours de traitement")
     plt.xlabel("Taille du buffer")
     plt.legend()
     
-def graph_WIP_p1_p2_r1_r2(ListeTableauSimulation, parametre_controle):
-    WIP = []
-    Proba = [ k/100 for k in range(1,101)]
+def graph_WIP_p1_p2_r1_r2(ListeTableauSimulation, nb_simulation, parametre_controle ):
     N = len(ListeTableauSimulation)
-    T = len(ListeTableauSimulation[0])
+    Tmax = len(ListeTableauSimulation[0])
+    WIP = []
+    wip = []
+    Proba = []
     
     for k in range(N):
-        WIP.append(work_in_progress(ListeTableauSimulation[k],T-1))
+        wip.append(work_in_progress(ListeTableauSimulation[k],Tmax-1))
+        if k % nb_simulation == nb_simulation-1:
+            Proba.append(0.01*(k+1)/nb_simulation)
+            WIP.append(np.mean(wip))
+            wip = []
     
     plt.plot(Proba, WIP, label="WIP en fonction de " + parametre_controle)
     plt.ylabel("WIP")
@@ -152,22 +161,25 @@ def throughput(TableauSimulation):
         S += TableauSimulation[t][-2]
     return S
 
-def graph_throughput_plusieurs_simulations(ListeTableauSimulation):
+def graph_throughput_plusieurs_simulations(ListeTableauSimulation, nb_simulation):
     Tailles_buffer = []
     N = len(ListeTableauSimulation)
     Tmax = len(ListeTableauSimulation[0])
     Thoughputs = []
+    thoughputs = []
 
     for k in range(N):
-        Tailles_buffer.append(k+1)
-        Thoughputs.append(throughput(ListeTableauSimulation[k])) 
+        thoughputs.append(throughput(ListeTableauSimulation[k]))
+        if k % nb_simulation == nb_simulation-1:
+            Tailles_buffer.append((k+1)/nb_simulation)
+            Thoughputs.append(np.mean(thoughputs))
+            thoughputs = []
     
     plt.plot(Tailles_buffer, Thoughputs, label = "nombre de pièces terminées")
     plt.xlabel("Taille du buffer")
     plt.legend()
     
 
-    
 # BLOCKING PROBABILITY
 
 
@@ -353,7 +365,7 @@ def graph_effective_production_rate_r1(ListeTableauSimulation, window_lenght, ta
         
     plt.plot(Probas, Eeff, label = "B = " + str(taille_du_buffer))
     plt.xlabel("r1")
-    plt.ylabel("Effective produuction rate")
+    plt.ylabel("Effective production rate")
     plt.legend()
 
     
