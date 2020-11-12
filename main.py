@@ -1,4 +1,4 @@
-from PerformanceIndicator import *
+from indicateurs_de_performance import *
 from SharedFunctions import *
 from Buffer import *
 from System import System

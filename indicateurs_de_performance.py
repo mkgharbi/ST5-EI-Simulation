@@ -42,7 +42,7 @@ def proba_distrib_LT(TableauSimulation, temps_attendu):
         LT.append(T_sortie[k]-T_entree[k]+1)
     
     if LT ==[]:
-        return "pas de pieces qui sortent, on ne peut pas définir une moyenne"
+        return 0
     S = 0
     for t in LT:
         if t == temps_attendu:
@@ -63,7 +63,14 @@ def graph_proba_distrib_LT(TableauSimulation):
     plt.xlabel("Temps nécéssaire à la fabrication d'une pièce")
     plt.ylabel("Probabilité")
     plt.show()
-    
+
+def Moyenne(L):
+    N = len(L)
+    S = 0
+    for l in L:
+        S += l
+    return S/N
+
 def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
     Delais = []
     Probas = []
@@ -72,11 +79,10 @@ def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
     
     for t in range(Tmax):
         Delais.append(t+1)
-        
         Liste_Probas_a_t = []
         for k in range(N):
             Liste_Probas_a_t.append(proba_distrib_LT(ListeTableauSimulation[k],t+1))
-        Probas.append(np.mean(Liste_Probas_a_t))
+        Probas.append(Moyenne(Liste_Probas_a_t))
     plt.plot(Delais,Probas)
     plt.xlabel("Temps nécéssaire à la fabrication d'une pièce")
     plt.ylabel("Probabilité")

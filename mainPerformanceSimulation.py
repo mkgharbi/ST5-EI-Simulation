@@ -45,10 +45,10 @@ def ChoosingPrabilities(indexInMachineTable, choiceVariable, numberMachine, mach
         repair_prob = 0
         if (j == indexInMachineTable):
             if (choiceVariable % 2 == 1):
-                breakdown_prob = 0.01
+                breakdown_prob = 0.02
                 repair_prob = probabilityRepairInput(j)
             else:
-                repair_prob = 0.01
+                repair_prob = 0.02
                 breakdown_prob = probabilityBreakdownInput(j)
         else: 
             breakdown_prob = probabilityBreakdownInput(j)
@@ -116,7 +116,7 @@ def main():
         elif(choice == "B"):
             bufferTable.clear()
             machineTable.clear()
-            historicSimulations.clear()
+            historicSimulations = []
             for i in range(numberMachine-1) :
                 sizei = bufferInput(i)
                 bufferTable.append(Buffer(Buffer.Type.MIDDLE,sizei,'Buffer'+str(i+1)))
@@ -134,7 +134,7 @@ def main():
                     system = System(numberMachine,machineTable,bufferTable)
                     timeSlot = int(input("Enter time slot of the simulation: "))
                     probabilityValue = 0.01
-                    while(probabilityValue < 1 or probabilityValue == 1):
+                    while(probabilityValue <= 0.4):
                         print("----------")
                         print("Simulation: " + str(probabilityValue))
                         incrementMachineProbability(system,indexInMachineTable ,choiceVariable, probabilityValue)
@@ -164,6 +164,7 @@ def main():
                             historicSimulations.append(historicStateCopy)
                             nbSimulation += 1
                         probabilityValue += 0.01
+                    graph_effective_production_rate_r1(historicSimulations,30, sizei, 1000)
                     break
                 else:
                     print("Choose a number from those proposed ")
@@ -173,8 +174,7 @@ def main():
             # Done: graph_work_in_progress_plusieurs_simulations(historicSimulations, 1000)
             # Done: graph_throughput_plusieurs_simulations(historicSimulations,1000)
             # done: graph_WIP_p1_p2_r1_r2(historicSimulations,1000,"r2")
-            graph_total_production_rate(historicSimulations, 40, 1000)
-            # Done: graph_effective_production_rate(historicSimulations,5,1000)
+            # 2a : graph_total_production_rate(historicSimulations, 40, 1000)
             plt.show()
             break
 
