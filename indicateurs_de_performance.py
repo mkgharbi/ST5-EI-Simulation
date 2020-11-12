@@ -299,7 +299,7 @@ def total_production_rate_plusieurs_simulations(ListeTableauSimulation, window_l
         Moyennes.append(total_production_rate(ListeTableauSimulation[k], window_lenght))
     return np.mean(Moyennes)
     
-def graph_total_production_rate(ListeTableauSimulation, wl):
+def graph_total_production_rate(ListeTableauSimulation, wl, nb_simul):
     N = len(ListeTableauSimulation)
     Tailles_buffer = []
     Prod_rate =[]

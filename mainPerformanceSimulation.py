@@ -1,5 +1,4 @@
 from Machine import Machine
-from PerformanceIndicator import *
 from SharedFunctions import *
 from System import System
 from Buffer import *
@@ -140,7 +139,12 @@ def main():
                         print("Simulation: " + str(probabilityValue))
                         incrementMachineProbability(system,indexInMachineTable ,choiceVariable, probabilityValue)
                         nbSimulation = 0
-                        while(nbSimulation < 100):
+                        while(nbSimulation < 1000):
+                            for buf in system.getBuffers():
+                                buf.reset()
+                            for machine in system.getMachines():
+                                machine.reset()
+                            system.resetHistoric()
                             instantT = 0
                             print("T = 0")
                             print(generateStringState(system))
@@ -165,14 +169,14 @@ def main():
                     print("Choose a number from those proposed ")
         elif(choice == "Q"):
             print(len(historicSimulations))
-            # Done : graph_work_in_progress_plusieurs_simulations(historicSimulations, 1000)
-            # Done :graph_throughput_plusieurs_simulations(historicSimulations,1000)
-            #graph_WIP_p1_p2_r1_r2(historicSimulations,100,"r2")
-            # Done :graph_total_production_rate(historicSimulations, 5, 1000)
-            #graph_effective_production_rate(historicSimulations,5,1000)
+            #print(historicSimulations)
+            # Done: graph_work_in_progress_plusieurs_simulations(historicSimulations, 1000)
+            # Done: graph_throughput_plusieurs_simulations(historicSimulations,1000)
+            # done: graph_WIP_p1_p2_r1_r2(historicSimulations,1000,"r2")
+            graph_total_production_rate(historicSimulations, 40, 1000)
+            # Done: graph_effective_production_rate(historicSimulations,5,1000)
             plt.show()
             break
-
 
 if __name__ == "__main__":
     main()
