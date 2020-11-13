@@ -1,0 +1,20 @@
+R{"WIP"}=? [ I=200 ]
+
+R{"Production_rate"}=? [ C<=timer]
+
+R{"Production"}=? [ C<=timer]
+
+R{"Starved2"}=? [ C<=timer]
+
+R{"Starved3"}=? [ C<=timer]
+
+R{"Blocked2"}=? [ C<=timer]
+
+R{"Blocked1"}=? [ C<=timer]
+
+R{"Broken1"}=? [ C<=timer]
+
+R{"Broken2"}=? [ C<=timer]
+
+R{"Broken3"}=? [ C<=timer]
+

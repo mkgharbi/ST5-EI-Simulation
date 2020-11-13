@@ -1,0 +1,8 @@
+R{"WIP"}=? [ I=200 ]
+
+R{"production_rate"}=? [ I=100 ]
+
+R{"Buffer_empty"}=? [ I=100 ]
+
+R{"Buffer_full"}=? [ I=100 ]
+
