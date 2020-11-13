@@ -394,9 +394,10 @@ def launch_simulation(root_window,machines,buffers,time_unit):
     def display_details(index):
         for child in simulation_details_frame.winfo_children():
             child.destroy()
-        Label(simulation_details_frame,text=stateStrings[index],bg="white").grid(row=0)
-        Label(simulation_details_frame,bg="white",text="Work in progress : "+str(work_in_progress(system.getHistoricState(),index))).grid(row=1)
-        Label(simulation_details_frame,bg="white",text="Througput : "+str(throughput(system.getHistoricState()[:index]))).grid(row=2)
+        Label(simulation_details_frame,text="Etape " + str(index),bg="white").grid(row=0)
+        Label(simulation_details_frame,text=stateStrings[index],bg="white").grid(row=1)
+        Label(simulation_details_frame,bg="white",text="Work in progress : "+str(work_in_progress(system.getHistoricState(),index))).grid(row=2)
+        Label(simulation_details_frame,bg="white",text="Througput : "+str(throughput(system.getHistoricState()[:index]))).grid(row=3)
         
     
      
