@@ -1,4 +1,4 @@
-from MachineLine import MachineLineNode
+from MachineLineNode import MachineLineNode
 from random import random
 
 P = lambda x: random() < x

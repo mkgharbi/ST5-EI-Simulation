@@ -1,7 +1,7 @@
 from tkinter import *
 from functools import partial
 from Machine import *
-from PerformanceIndicator import *
+from indicateurs_de_performance import *
 from Buffer import *
 from System import *
 def main_window():

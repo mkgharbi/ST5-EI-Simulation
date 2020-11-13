@@ -1,4 +1,4 @@
-from MachineLine import MachineLineNode
+from MachineLineNode import MachineLineNode
 from enum import Enum
 
 class Buffer (MachineLineNode):
