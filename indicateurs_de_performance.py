@@ -335,7 +335,7 @@ def graph_total_production_rate(ListeTableauSimulation, wl, nb_simul):
         prod_rate.append(effective_production_rate(ListeTableauSimulation[k],wl))
         if k % nb_simul == nb_simul-1:
             Tailles_buffer.append((k+1)/nb_simul)
-            Prod_rate.append(np.mean(prod_rate))
+            Prod_rate.append(np.mean(prod_rate)/wl)
             prod_rate = []
         
     plt.plot(Tailles_buffer, Prod_rate, label = "Taux de production total pour une fenêtre de "+ str(wl))
@@ -371,7 +371,7 @@ def effective_production_rate(TableauSimulation, window_lenght):
                     nb_exit +=1
         t+=1
         
-    return nb_exit / t
+    return nb_exit / t / window_lenght
     
 def effective_production_rate_plusieurs_simulations(ListeTableauSimulation, window_lenght):
     Moyennes = []
@@ -391,7 +391,7 @@ def graph_effective_production_rate(ListeTableauSimulation, wl, nb_simul):
         eeff.append(effective_production_rate(ListeTableauSimulation[k],wl))
         if k % nb_simul == nb_simul-1:
             Tailles_buffer.append((k+1)/nb_simul)
-            EEFF.append(np.mean(eeff))
+            EEFF.append(np.mean(eeff)/wl)
             eeff = []
         
     plt.plot(Tailles_buffer, EEFF, label = "Taux effectif de production pour une fenêtre de taille "+ str(wl)+" et "+str(nb_simul)+" simulations")
@@ -408,7 +408,7 @@ def graph_effective_production_rate_r1(ListeTableauSimulation, wl, buf_size, nb_
         eeff.append(effective_production_rate(ListeTableauSimulation[k], wl))
         if k % nb_simul == nb_simul-1:
             Probas.append(0.01*(k+1)/nb_simul + 0.01)
-            Eeff.append(np.mean(eeff))
+            Eeff.append(np.mean(eeff)/wl)
             eeff = []
     
     plt.plot(Probas, Eeff, label = "B = " + str(buf_size) )

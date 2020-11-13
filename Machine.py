@@ -39,12 +39,6 @@ class Machine (MachineLineNode):
             self.work = False
             self.release = self.is_up
     
-    def phase_1_manu (self):
-        if self.is_up and not self.is_blocked():
-            pass # Break machine?
-        elif not self.is_up:
-            pass # Repair machine?
-    
     def phase_2 (self):
         if self.work:
             self.upstream.pop()

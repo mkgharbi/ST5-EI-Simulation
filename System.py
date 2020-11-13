@@ -23,6 +23,7 @@ class System:
         return self.historicState
     def resetHistoric(self):
         self.historicState.clear()
+
     def resetSystem(self):
         for element in self.buffers:
             element.reset()
