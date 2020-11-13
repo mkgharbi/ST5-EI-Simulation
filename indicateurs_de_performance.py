@@ -75,9 +75,8 @@ def graph_proba_distrib_LT_plusieurs_simulations(ListeTableauSimulation):
     Delais = []
     Probas = []
     N = len(ListeTableauSimulation)
-    Tmax = len(ListeTableauSimulation[0])
     
-    for t in range(Tmax):
+    for t in range(30):
         Delais.append(t+1)
         Liste_Probas_a_t = []
         for k in range(N):
