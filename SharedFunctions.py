@@ -61,3 +61,18 @@ def resetTables(system):
     for machine in system.getMachines():
         machine.reset()
     system.resetHistoric()
+
+def generation(system):
+    possibleNextStates = []
+    for i in range(len(system.getMachines())-1):
+        copySystem = system
+        if (i == 0):
+            copySystem.getMachines()[i].switchIs_Up()
+            possibleNextStates.append(copySystem.getCurrentState())
+        else: 
+            if (copySystem.getBuffers()[i].is_empty()):
+                copySystem.getMachines()[i+1].setIs_Up(True)
+            else:
+                copySystem.getMachines()[i+1].switchIs_Up()
+            possibleNextStates.append(copySystem.getCurrentState())
+    return possibleNextStates

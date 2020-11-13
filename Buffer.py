@@ -2,13 +2,13 @@ from MachineLine import MachineLineNode
 from enum import Enum
 
 class Buffer (MachineLineNode):
-    
     class Type (Enum):
         MIDDLE = 0
         INPUT = 1
         OUTPUT = 2
         INPUT_COUNTER = 3
         OUTPUT_COUNTER = 4
+    
     
     def __init__ (self, buffer_type, capacity, name):
         self.type = buffer_type

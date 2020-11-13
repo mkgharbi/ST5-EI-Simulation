@@ -84,7 +84,7 @@ def main():
             while(simulationCounter <= MAXSIMULATIONBUFFERINCREMENTED):
                 system.setCommonCapacity(simulationCounter)
                 simulation = 0
-                while(simulation < 100):
+                while(simulation < 50):
                     print("Simulation: ")
                     print("T = 0")
                     print(generateStringState(system))
@@ -164,13 +164,10 @@ def main():
                             historicSimulations.append(historicStateCopy)
                             nbSimulation += 1
                         probabilityValue += 0.01
-                    #graph_effective_production_rate_r1(historicSimulations,30,sizei,1000)
                     break
                 else:
                     print("Choose a number from those proposed ")
         elif(choice == "Q"):
-            graph_effective_production_rate(historicSimulations,40,100)
-            graph_total_production_rate(historicSimulations,40,100)
             plt.show()
             break
 

@@ -3,21 +3,6 @@ from SharedFunctions import *
 from Buffer import *
 from System import System
 from Machine import Machine
-
-def generation(system):
-    possibleNextStates = []
-    for i in range(len(system.getMachines())-1):
-        copySystem = system
-        if (i == 0):
-            copySystem.getMachines()[i].switchIs_Up()
-            possibleNextStates.append(copySystem.getCurrentState())
-        else: 
-            if (copySystem.getBuffers()[i].is_empty()):
-                copySystem.getMachines()[i+1].setIs_Up(True)
-            else:
-                copySystem.getMachines()[i+1].switchIs_Up()
-            possibleNextStates.append(copySystem.getCurrentState())
-    return possibleNextStates
     
 def main():
     print("------Simulation------")
@@ -49,12 +34,6 @@ def main():
         print("--Click Q: Exit")
         choice = input("Pick your choice : ").upper()
         if (choice == "Q"):
-            graph_proba_distrib_LT_plusieurs_simulations(historicSimulations)
-            #graph_work_in_progress(historicSimulations)
-            # graph_blocking_probability_plusieurs_simulations(historicSimulations)
-            # graph_stravation_probability_plusieurs_simulations(historicSimulations)
-            plt.show()
-            #graph_blocking_probability_plusieurs_simulations(historicSimulations)
             break
         else:
             if (choice == "A"):
