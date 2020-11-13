@@ -119,7 +119,7 @@ def main_window():
     root_window.geometry('400x400')
 
     def format_machine_display(machine):
-        return machine[0]+" : p="+str(machine[1])+", q="+str(machine[2])
+        return machine[0]+" : p="+str(machine[1])+", r="+str(machine[2])
 
     def format_buffer_display(buffer):
         return buffer[0]+" : capacité="+str(buffer[1])
@@ -394,8 +394,10 @@ def launch_simulation(root_window,machines,buffers,time_unit):
     def display_details(index):
         for child in simulation_details_frame.winfo_children():
             child.destroy()
-        Label(simulation_details_frame,text=stateStrings[index],bg="white").grid(row=0)
-        Label(simulation_details_frame,bg="white",text="Work in progress : "+str(work_in_progress(system.getHistoricState()[1:],index))).grid(row=1)
+        Label(simulation_details_frame,text="Etape " + str(index),bg="white").grid(row=0)
+        Label(simulation_details_frame,text=stateStrings[index],bg="white").grid(row=1)
+        Label(simulation_details_frame,bg="white",text="Work in progress : "+str(work_in_progress(system.getHistoricState(),index))).grid(row=2)
+        Label(simulation_details_frame,bg="white",text="Througput : "+str(throughput(system.getHistoricState()[:index]))).grid(row=3)
         
     
      
