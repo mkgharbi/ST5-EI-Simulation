@@ -1,5 +1,4 @@
 from Machine import Machine
-from PerformanceIndicator import *
 from SharedFunctions import *
 from System import System
 from Buffer import *
@@ -117,7 +116,7 @@ def main():
         elif(choice == "B"):
             bufferTable.clear()
             machineTable.clear()
-            historicSimulations.clear()
+            historicSimulations = []
             for i in range(numberMachine-1) :
                 sizei = bufferInput(i)
                 bufferTable.append(Buffer(Buffer.Type.MIDDLE,sizei,'Buffer'+str(i+1)))
@@ -134,13 +133,18 @@ def main():
                     machineTable = ChoosingPrabilities(indexInMachineTable,choiceVariable,numberMachine,machineTable,bufferTable)
                     system = System(numberMachine,machineTable,bufferTable)
                     timeSlot = int(input("Enter time slot of the simulation: "))
-                    probabilityValue = 0.01
-                    while(probabilityValue < 1 or probabilityValue == 1):
+                    probabilityValue = 0.02
+                    while(probabilityValue <= 0.4):
                         print("----------")
                         print("Simulation: " + str(probabilityValue))
                         incrementMachineProbability(system,indexInMachineTable ,choiceVariable, probabilityValue)
                         nbSimulation = 0
-                        while(nbSimulation < 100):
+                        while(nbSimulation < 1000):
+                            for buf in system.getBuffers():
+                                buf.reset()
+                            for machine in system.getMachines():
+                                machine.reset()
+                            system.resetHistoric()
                             instantT = 0
                             print("T = 0")
                             print(generateStringState(system))
@@ -160,19 +164,21 @@ def main():
                             historicSimulations.append(historicStateCopy)
                             nbSimulation += 1
                         probabilityValue += 0.01
+                    graph_effective_production_rate_r1(historicSimulations,30,sizei,1000)
                     break
                 else:
                     print("Choose a number from those proposed ")
         elif(choice == "Q"):
             print(len(historicSimulations))
-            # Done : graph_work_in_progress_plusieurs_simulations(historicSimulations, 1000)
-            # Done :graph_throughput_plusieurs_simulations(historicSimulations,1000)
-            #graph_WIP_p1_p2_r1_r2(historicSimulations,100,"r2")
-            # Done :graph_total_production_rate(historicSimulations, 5, 1000)
-            #graph_effective_production_rate(historicSimulations,5,1000)
+            #graph_effective_production_rate(historicSimulations, 30 ,1000)
+            #graph_total_production_rate(historicSimulations, 30 ,1000)
             plt.show()
+            #print(historicSimulations)
+            # Done: graph_work_in_progress_plusieurs_simulations(historicSimulations, 1000)
+            # Done: graph_throughput_plusieurs_simulations(historicSimulations,1000)
+            # done: graph_WIP_p1_p2_r1_r2(historicSimulations,1000,"r2")
+            # 2a : graph_total_production_rate(historicSimulations, 40, 1000)
             break
-
 
 if __name__ == "__main__":
     main()
